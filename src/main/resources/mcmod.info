@@ -1,0 +1,16 @@
+[
+{
+  "modid": "bwpobstacles",
+  "name": "BWP Obstacles Mod",
+  "description": "bedwarspractice.club obstacles gamemode helper",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["quasar098"],
+  "credits": "tom (vitulus), for making the server",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

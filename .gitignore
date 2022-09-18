@@ -1,0 +1,11 @@
+out
+*.ipr
+*.iws
+*.iml
+.idea
+.vs
+build
+eclipse
+run
+.gradle
+forge-1.8.9-11.15.1.2318-1.8.9-changelog.txt
