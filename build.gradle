@@ -7,6 +7,9 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        flatDir {
+            dirs 'libs'
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
@@ -21,7 +24,7 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "1.0"
+version = "1.1"
 group= "com.quasar.bwpobstacles" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "bwpobstacles"
 
@@ -63,9 +66,9 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
+    compile files('libs/async-http-client.jar')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
-
 processResources
 {
     // this will ensure that this task is redone when the versions change.
@@ -84,4 +87,8 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+    from ('libs') {
+        include '*.jar'
+    }
+
 }

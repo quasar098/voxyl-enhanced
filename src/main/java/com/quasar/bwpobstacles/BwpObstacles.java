@@ -2,6 +2,7 @@ package com.quasar.bwpobstacles;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mb3364.http.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -20,14 +21,12 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -35,7 +34,9 @@ import java.util.regex.Pattern;
 public class BwpObstacles
 {
     public static final String MODID = "bwpobstacles";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.1";
+
+    public static AsyncHttpClient client = new AsyncHttpClient();
 
     public static boolean isInObstacles = false;
     public static int inObstaclesTickDelay = -1;
@@ -51,6 +52,8 @@ public class BwpObstacles
     public static String opponentName = null;
     public static boolean opponentWinsHasLoaded = false;
     public static String opponentWins = "???";
+
+    public static HashMap<String, Integer> winsMap = new HashMap<>();
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
     
@@ -136,6 +139,13 @@ public class BwpObstacles
             }
         }
         public void attemptMakeApiRequest() {
+            if (opponentName == null) {
+                return;
+            }
+            if (winsMap.containsKey(opponentName)) {
+                opponentWins = winsMap.get(opponentName).toString();
+                return;
+            }
             System.setProperty("http.agent", "Chrome");
             try {
                 if (apiKey.equals("NOAPIKEY!")) {
@@ -144,35 +154,37 @@ public class BwpObstacles
                 }
                 UUID id = Minecraft.getMinecraft().theWorld.getPlayerEntityByName(opponentName).getUniqueID();
 
-                URL url = new URL("http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + apiKey);
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setConnectTimeout(2000);
-                con.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
-                con.setRequestMethod("GET");
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuilder content = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
-
-                JsonParser parser = new JsonParser();
-                JsonObject obj = (JsonObject) parser.parse(content.toString());
-                JsonObject stats = (JsonObject) obj.get("stats");
-                if (stats == null) {
-                    opponentWins = "ERROR!";
-                    return;
-                }
-                JsonObject obstacles = (JsonObject) stats.get("obstacleSingle");
-                if (obstacles == null) {
-                    opponentWins = "0";
-                    return;
-                }
-                opponentWins = obstacles.get("wins").getAsString();
-
-                in.close();
-            } catch (Exception ignored) {}
+                String url = "http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + apiKey;
+                client.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+                client.setConnectionTimeout(3000);
+                client.get(url, new StringHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int i, Map<String, List<String>> map, String content) {
+                        JsonParser parser = new JsonParser();
+                        JsonObject obj = (JsonObject) parser.parse(content);
+                        JsonObject stats = (JsonObject) obj.get("stats");
+                        if (stats == null) {
+                            opponentWins = "ERROR!";
+                            return;
+                        }
+                        JsonObject obstacles = (JsonObject) stats.get("obstacleSingle");
+                        if (obstacles == null) {
+                            opponentWins = "0";
+                            return;
+                        }
+                        opponentWins = obstacles.get("wins").getAsInt() + "";
+                        winsMap.put(opponentName, obstacles.get("wins").getAsInt());
+                    }
+                    @Override
+                    public void onFailure(int i, Map<String, List<String>> map, String s) {
+                        opponentWins = "ERROR: " + i;
+                    }
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        opponentWins = "ERROR!";
+                    }
+                });
+            } catch (Exception err) { err.printStackTrace(); }
         }
         @SubscribeEvent
         public void tickEvent(TickEvent.PlayerTickEvent event) {
