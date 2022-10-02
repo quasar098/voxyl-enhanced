@@ -6,6 +6,7 @@ import com.mb3364.http.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -13,6 +14,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -21,6 +24,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -34,7 +39,7 @@ import java.util.regex.Pattern;
 public class BwpObstacles
 {
     public static final String MODID = "bwpobstacles";
-    public static final String VERSION = "1.1";
+    public static final String VERSION = "1.2";
 
     public static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -52,6 +57,10 @@ public class BwpObstacles
     public static String opponentName = null;
     public static boolean opponentWinsHasLoaded = false;
     public static String opponentWins = "???";
+
+    public static boolean modIsOn = true;
+
+    public static Integer startingX = null;
 
     public static HashMap<String, Integer> winsMap = new HashMap<>();
 
@@ -94,12 +103,15 @@ public class BwpObstacles
             config.load();
         }
 
+        Property modOnProp = config.get(Configuration.CATEGORY_CLIENT, "obstaclesModToggledOn", true, "whether the bwp obstacles mod is on or not");
         Property apiKeyProp = config.get(Configuration.CATEGORY_CLIENT, "apikey", "NOAPIKEY!", "api key for voxyl network");
 
         if (loadFromFile) {
+            modIsOn = modOnProp.getBoolean();
             apiKey = apiKeyProp.getString();
         } else {
             apiKeyProp.set(apiKey);
+            modOnProp.set(modIsOn);
         }
 
         if (config.hasChanged()) {
@@ -194,6 +206,7 @@ public class BwpObstacles
             }
             if (inObstaclesTickDelay == 0) {
                 attemptMakeApiRequest();
+                startingX = Math.toIntExact(Math.round(Minecraft.getMinecraft().thePlayer.posX));
             }
         }
 
@@ -207,11 +220,10 @@ public class BwpObstacles
                 newTime = System.currentTimeMillis();
             }
         }
-
         @SubscribeEvent
         public void render(RenderGameOverlayEvent.Text event) {
             updateFontRenderer();
-            if (isInObstacles) {
+            if (isInObstacles && modIsOn) {
 
                 ScaledResolution var5 = new ScaledResolution(Minecraft.getMinecraft());
                 int width = var5.getScaledWidth();
@@ -231,6 +243,20 @@ public class BwpObstacles
                     int timeWidth = fontRenderer.getStringWidth(timeString);
                     fontRenderer.drawString(timeString, width - (timeWidth + 5), 35, 0xFFFFFF, true);
                 }
+
+                if (startingX != null) {
+                    double diff = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
+                    double thing =((diff) / 175) * 100;
+                    if (thing > 100) {
+                        thing = 100;
+                    }
+                    if (thing < 0) {
+                        thing = 0;
+                    }
+                    String percentageDoneString = "Percentage done: " + df.format(thing);
+                    int percentageDoneWidth = fontRenderer.getStringWidth(percentageDoneString);
+                    fontRenderer.drawString(percentageDoneString, width - (percentageDoneWidth + 5), 50, 0xFFFFFF, true);
+                }
             }
         }
         @SubscribeEvent
@@ -243,6 +269,7 @@ public class BwpObstacles
             isInObstacles = false;
             stopGrowingTime = false;
             opponentWinsHasLoaded = false;
+            startingX = null;
         }
         @SubscribeEvent
         public void worldUnload(WorldEvent.Unload event) {

@@ -29,7 +29,11 @@ public class BwpObstaclesCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length == 0) improperUsageWarning();
         else if (args[0].equals("help")) commandHelpMessage();
-        else if (args[0].equals("setkey")) {
+        else if (args[0].equals("toggle")) {
+            BwpObstacles.modIsOn = !BwpObstacles.modIsOn;
+            messageResponse("Toggled bwp obstacles mod " + (BwpObstacles.modIsOn ? "on" : "off"));
+            BwpObstacles.configurate(false);
+        } else if (args[0].equals("setkey")) {
             if (args.length == 2) {
                 try {
                     BwpObstacles.apiKey = args[1];
