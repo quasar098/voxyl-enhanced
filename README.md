@@ -3,6 +3,7 @@
 ### usage:
 
 /bwpobstacles setkey {key}
+
 /bwpobstacles toggle
 
 ### allowed on bwp?
