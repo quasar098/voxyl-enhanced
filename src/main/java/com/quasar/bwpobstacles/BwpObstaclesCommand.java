@@ -29,7 +29,11 @@ public class BwpObstaclesCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length == 0) improperUsageWarning();
         else if (args[0].equals("help")) commandHelpMessage();
-        else if (args[0].equals("toggle")) {
+        else if (args[0].equals("alignment")) {
+            BwpObstacles.rightAligned = !BwpObstacles.rightAligned;
+            messageResponse("Toggled alignment to " + (BwpObstacles.rightAligned ? "right" : "left"));
+            BwpObstacles.configurate(false);
+        } else if (args[0].equals("toggle")) {
             BwpObstacles.modIsOn = !BwpObstacles.modIsOn;
             messageResponse("Toggled bwp obstacles mod " + (BwpObstacles.modIsOn ? "on" : "off"));
             BwpObstacles.configurate(false);
@@ -56,6 +60,8 @@ public class BwpObstaclesCommand extends CommandBase {
         messageResponse(
                 "How to use bwp obstacles mod:",
                 "/bwpobstacles setkey <key> - set api key",
+                "/bwpobstacles toggle - toggle the mod",
+                "/bwpobstacles alignment - toggle alignment",
                 "/api new - get an api key from bwp"
         );
     }

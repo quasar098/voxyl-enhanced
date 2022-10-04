@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 public class BwpObstacles
 {
     public static final String MODID = "bwpobstacles";
-    public static final String VERSION = "1.2";
+    public static final String VERSION = "1.3";
 
     public static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -61,6 +61,8 @@ public class BwpObstacles
     public static boolean modIsOn = true;
 
     public static Integer startingX = null;
+
+    public static boolean rightAligned = true;
 
     public static HashMap<String, Integer> winsMap = new HashMap<>();
 
@@ -105,13 +107,16 @@ public class BwpObstacles
 
         Property modOnProp = config.get(Configuration.CATEGORY_CLIENT, "obstaclesModToggledOn", true, "whether the bwp obstacles mod is on or not");
         Property apiKeyProp = config.get(Configuration.CATEGORY_CLIENT, "apikey", "NOAPIKEY!", "api key for voxyl network");
+        Property rightAlignProp = config.get(Configuration.CATEGORY_CLIENT, "rightAlign", true, "is right aligned?");
 
         if (loadFromFile) {
             modIsOn = modOnProp.getBoolean();
             apiKey = apiKeyProp.getString();
+            rightAligned = rightAlignProp.getBoolean();
         } else {
             apiKeyProp.set(apiKey);
             modOnProp.set(modIsOn);
+            rightAlignProp.set(rightAligned);
         }
 
         if (config.hasChanged()) {
@@ -231,17 +236,20 @@ public class BwpObstacles
                 // death count
                 String dCountString = "Death count: " + deathCount;
                 int dCountWidth = fontRenderer.getStringWidth(dCountString);
-                fontRenderer.drawString(dCountString, width - (dCountWidth + 5), 5, 0xFFFFFF, true);
+                int dCountX = rightAligned ? width - (dCountWidth + 5) : 5;
+                fontRenderer.drawString(dCountString, dCountX, 5, 0xFFFFFF, true);
 
                 // opponent wins
                 String opponentWinsString = "Opponent win stats: " + opponentWins;
                 int opponentWinsWidth = fontRenderer.getStringWidth(opponentWinsString);
-                fontRenderer.drawString(opponentWinsString, width - (opponentWinsWidth + 5), 20, 0xFFFFFF, true);
+                int opponentWinsX = rightAligned ? width - (opponentWinsWidth + 5) : 5;
+                fontRenderer.drawString(opponentWinsString, opponentWinsX, 20, 0xFFFFFF, true);
 
                 if (time != null && newTime != null) {
                     String timeString = "Time elapsed: " + df.format((newTime-time)/1000.0);
                     int timeWidth = fontRenderer.getStringWidth(timeString);
-                    fontRenderer.drawString(timeString, width - (timeWidth + 5), 35, 0xFFFFFF, true);
+                    int timeX = rightAligned ? width - (timeWidth + 5) : 5;
+                    fontRenderer.drawString(timeString, timeX, 35, 0xFFFFFF, true);
                 }
 
                 if (startingX != null) {
@@ -255,7 +263,23 @@ public class BwpObstacles
                     }
                     String percentageDoneString = "Percentage done: " + df.format(thing);
                     int percentageDoneWidth = fontRenderer.getStringWidth(percentageDoneString);
-                    fontRenderer.drawString(percentageDoneString, width - (percentageDoneWidth + 5), 50, 0xFFFFFF, true);
+                    int percentageDoneX = rightAligned ? width - (percentageDoneWidth + 5) : 5;
+                    fontRenderer.drawString(percentageDoneString, percentageDoneX, 50, 0xFFFFFF, true);
+
+                    if (time != null && newTime != null) {
+                        try {
+                            double timeElapsed = (newTime - time) / 1000.0;
+                            double distanceTraveled = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
+
+                            double estimatedArrival = timeElapsed/(distanceTraveled/175);
+                            String estimatedArrivalString = (0 >= estimatedArrival || Double.isInfinite(estimatedArrival))
+                                    ? "3-5 business days"
+                                    : ("Estimated arrival: " + df.format(estimatedArrival));
+                            int estimatedArrivalWidth = fontRenderer.getStringWidth(estimatedArrivalString);
+                            int estimatedArrivalX = rightAligned ? width - (estimatedArrivalWidth + 5) : 5;
+                            fontRenderer.drawString(estimatedArrivalString, estimatedArrivalX, 65, 0xFFFFFF, true);
+                        } catch (Exception ignored) {}
+                    }
                 }
             }
         }

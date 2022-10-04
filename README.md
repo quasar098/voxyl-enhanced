@@ -6,6 +6,8 @@
 
 /bwpobstacles toggle
 
+/bwpobstacles alignment
+
 ### allowed on bwp?
 
 idk lol but hopefully
