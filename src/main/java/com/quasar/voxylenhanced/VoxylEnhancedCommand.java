@@ -82,7 +82,7 @@ public class VoxylEnhancedCommand extends CommandBase {
             }
         }
         if (args.length == 1) {
-            messageResponse("Your api key is " + VoxylEnhanced.apiKey.equals("missing"));
+            messageResponse("Your api key is " + VoxylEnhanced.apiKey);
         }
     }
 

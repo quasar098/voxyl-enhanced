@@ -79,4 +79,9 @@ public class VoxylAutoGG extends VoxylFeature {
             }
         }
     }
+
+    public void reset() {
+        lastNumberOfKills = 0;
+        timeAtLastGG = null;
+    }
 }

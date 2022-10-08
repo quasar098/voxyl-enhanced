@@ -272,8 +272,8 @@ public class VoxylObstacles extends VoxylFeature {
             }
         }
     }
-    @SubscribeEvent
-    public void worldLoad(WorldEvent.Load event) {
+
+    public void reset() {
         deathCount = 0;
         opponentName = null;
         opponentWins = "???";

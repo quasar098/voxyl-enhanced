@@ -7,11 +7,13 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 import java.util.List;
@@ -32,10 +34,10 @@ public class VoxylEnhanced
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+        MinecraftForge.EVENT_BUS.register(new VoxylEnhancedMainListener());
         for (VoxylFeature listener : listeners) {
             MinecraftForge.EVENT_BUS.register(listener);
         }
-
         ClientCommandHandler.instance.registerCommand(new VoxylEnhancedCommand());
     }
 
@@ -67,6 +69,16 @@ public class VoxylEnhanced
 
         if (config.hasChanged()) {
             config.save();
+        }
+    }
+
+    @SuppressWarnings("InnerClassMayBeStatic")
+    public class VoxylEnhancedMainListener {
+        @SubscribeEvent
+        public void worldLoad(WorldEvent.Load event) {
+            for (VoxylFeature listener : listeners) {
+                listener.reset();
+            }
         }
     }
 }
