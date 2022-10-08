@@ -1,16 +1,14 @@
-[
-{
-  "modid": "bwpobstacles",
-  "name": "BWP Obstacles Mod",
-  "description": "bedwarspractice.club obstacles gamemode helper",
+[{
+  "modid": "voxylenhanced",
+  "name": "Voxyl Enhanced",
+  "description": "voxyl network helper (you will be more informed ? maybe)",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://github.com/quasar098/voxyl-enhanced/releases",
   "updateUrl": "",
   "authorList": ["quasar098"],
-  "credits": "tom (vitulus), for making the server",
+  "credits": "tom for making the server; bananza for ideas; rarme for \"critisism\" (I AM THE REAL ONE)",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
-}
-]
+}]

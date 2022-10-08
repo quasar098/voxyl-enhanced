@@ -1,13 +1,16 @@
-# bwp obstacles
+# voxyl enhanced
 
-### usage:
+### it does this:
 
-/bwpobstacles setkey {key}
+- autogg
+- obstacles info
 
-/bwpobstacles toggle
+### command aliases:
 
-/bwpobstacles alignment
+/ve
 
-### allowed on bwp?
+/voxylenhanced
 
-idk lol but hopefully
+### allowed on voxyl network?
+
+maybe
