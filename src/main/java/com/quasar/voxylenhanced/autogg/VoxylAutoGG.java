@@ -71,7 +71,7 @@ public class VoxylAutoGG extends VoxylFeature {
         if (toggled) {
             Pattern pattern2 = Pattern.compile("^\\+.* kills");
             if (pattern2.matcher(event.message.getUnformattedText()).find()) {
-                lastNumberOfKills = Integer.parseInt(StringUtils.substringBetween(event.message.getUnformattedText(), "+", " k"));
+                lastNumberOfKills = VoxylUtils.getIntBetween(event.message.getUnformattedText(), "+", " k");
             }
             Pattern pattern = Pattern.compile("^You have gained .*XP from this game!$");
             if (pattern.matcher(event.message.getUnformattedText()).find()) {

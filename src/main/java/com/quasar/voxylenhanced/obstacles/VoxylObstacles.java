@@ -8,13 +8,11 @@ import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
 import com.quasar.voxylenhanced.VoxylUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -41,12 +39,12 @@ public class VoxylObstacles extends VoxylFeature {
     public static Long time = null;
     public static Long newTime = null;
     public static boolean stopGrowingTime = false;
+    public static double pbTime = 1440;
 
     // other
     public static boolean isInObstacles = false;
     public static int inObstaclesTickDelay = -1;
     private static final DecimalFormat df = new DecimalFormat("0.00");
-    public static FontRenderer fontRenderer = null;
     public static Integer startingX = null;
     public static int deathCount = 0;
     public static HashMap<String, Integer> winsMap = new HashMap<>();
@@ -55,13 +53,16 @@ public class VoxylObstacles extends VoxylFeature {
     public void configurate(Configuration config, boolean loadFromFile) {
         Property toggledProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-toggled", true, "Is obstacles UI on or not");
         Property leftAlignedProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-leftAligned", false, "Is UI left aligned instead of right aligned");
+        Property pbTimeProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-pb", 1440, "personal best time");
 
         if (loadFromFile) {
             toggled = toggledProp.getBoolean();
             leftAligned = leftAlignedProp.getBoolean();
+            pbTime = pbTimeProp.getDouble();
         } else {
             leftAlignedProp.set(leftAligned);
             toggledProp.set(toggled);
+            pbTimeProp.set(pbTime);
         }
     }
 
@@ -129,12 +130,20 @@ public class VoxylObstacles extends VoxylFeature {
         Pattern stopGrowPattern = Pattern.compile("^Total time was.*:.*$");
         if (stopGrowPattern.matcher(event.message.getUnformattedText()).find()) {
             stopGrowingTime = true;
+            double replaceTime = VoxylUtils.getIntBetween(event.message.getUnformattedText(), "s ", ":")*60;
+            replaceTime += VoxylUtils.getIntBetween(event.message.getUnformattedText(), ":", ".");
+            replaceTime += VoxylUtils.getIntAfter(event.message.getUnformattedText(), ".")/1000f;
+            if (replaceTime < pbTime) {
+                pbTime = replaceTime;
+                VoxylUtils.informPlayer(EnumChatFormatting.GRAY, "New PB!");
+                VoxylEnhanced.configurate(false);
+            }
+            newTime = new Double(replaceTime).longValue() + time;
         }
     }
     public void attemptMakeApiRequest() {
         // opponent must have name
         if (opponentName == null) {
-
             return;
         }
         // retrieve opponent win stats from cache
@@ -154,40 +163,44 @@ public class VoxylObstacles extends VoxylFeature {
                 return;
             }
 
-            // get player in the world
-            UUID id = Minecraft.getMinecraft().theWorld.getPlayerEntityByName(opponentName).getUniqueID();
+            try {
+                // get player in the world
+                UUID id = Minecraft.getMinecraft().theWorld.getPlayerEntityByName(opponentName).getUniqueID();
 
-            // make async api request
-            String url = "http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + VoxylEnhanced.apiKey;
-            client.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
-            client.setConnectionTimeout(3000);
-            client.get(url, new StringHttpResponseHandler() {
-                @Override
-                public void onSuccess(int i, Map<String, List<String>> map, String content) {
-                    JsonParser parser = new JsonParser();
-                    JsonObject obj = (JsonObject) parser.parse(content);
-                    JsonObject stats = (JsonObject) obj.get("stats");
-                    if (stats == null) {
+                // make async api request
+                String url = "http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + VoxylEnhanced.apiKey;
+                client.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+                client.setConnectionTimeout(3000);
+                client.get(url, new StringHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int i, Map<String, List<String>> map, String content) {
+                        JsonParser parser = new JsonParser();
+                        JsonObject obj = (JsonObject) parser.parse(content);
+                        JsonObject stats = (JsonObject) obj.get("stats");
+                        if (stats == null) {
+                            opponentWins = "ERROR!";
+                            return;
+                        }
+                        JsonObject obstacles = (JsonObject) stats.get("obstacleSingle");
+                        if (obstacles == null) {
+                            opponentWins = "0";
+                            return;
+                        }
+                        opponentWins = obstacles.get("wins").getAsInt() + "";
+                        winsMap.put(opponentName, obstacles.get("wins").getAsInt());
+                    }
+                    @Override
+                    public void onFailure(int i, Map<String, List<String>> map, String s) {
+                        opponentWins = "ERROR: " + i;
+                    }
+                    @Override
+                    public void onFailure(Throwable throwable) {
                         opponentWins = "ERROR!";
-                        return;
                     }
-                    JsonObject obstacles = (JsonObject) stats.get("obstacleSingle");
-                    if (obstacles == null) {
-                        opponentWins = "0";
-                        return;
-                    }
-                    opponentWins = obstacles.get("wins").getAsInt() + "";
-                    winsMap.put(opponentName, obstacles.get("wins").getAsInt());
-                }
-                @Override
-                public void onFailure(int i, Map<String, List<String>> map, String s) {
-                    opponentWins = "ERROR: " + i;
-                }
-                @Override
-                public void onFailure(Throwable throwable) {
-                    opponentWins = "ERROR!";
-                }
-            });
+                });
+            } catch (NullPointerException e) {
+                opponentWins = "No opponent";
+            }
         } catch (Exception err) { err.printStackTrace(); }
     }
 
@@ -203,71 +216,36 @@ public class VoxylObstacles extends VoxylFeature {
         }
     }
 
-    public void updateFontRenderer() {
-        if (fontRenderer == null) {
-            try {
-                fontRenderer = Minecraft.getMinecraft().fontRendererObj;
-            } catch (Exception ignored) {}
-        }
+    @SubscribeEvent
+    public void render(RenderGameOverlayEvent.Text event) {
         if (!stopGrowingTime) {
             newTime = System.currentTimeMillis();
         }
-    }
-
-    @SubscribeEvent
-    public void render(RenderGameOverlayEvent.Text event) {
-        updateFontRenderer();
         if (isInObstacles && toggled) {
-
-            ScaledResolution var5 = new ScaledResolution(Minecraft.getMinecraft());
-            int width = var5.getScaledWidth();
+            VoxylUtils.textY = 5;
 
             // death count
-            String dCountString = "Death count: " + deathCount;
-            int dCountWidth = fontRenderer.getStringWidth(dCountString);
-            int dCountX = (!leftAligned) ? width - (dCountWidth + 5) : 5;
-            fontRenderer.drawString(dCountString, dCountX, 5, 0xFFFFFF, true);
+            VoxylUtils.drawText("Death count: " + deathCount, leftAligned);
 
             // opponent wins
-            String opponentWinsString = "Opponent win stats: " + opponentWins;
-            int opponentWinsWidth = fontRenderer.getStringWidth(opponentWinsString);
-            int opponentWinsX = (!leftAligned) ? width - (opponentWinsWidth + 5) : 5;
-            fontRenderer.drawString(opponentWinsString, opponentWinsX, 20, 0xFFFFFF, true);
+            VoxylUtils.drawText("Opponent win stats: " + opponentWins, leftAligned);
 
             if (time != null && newTime != null) {
-                String timeString = "Time elapsed: " + df.format((newTime-time)/1000.0);
-                int timeWidth = fontRenderer.getStringWidth(timeString);
-                int timeX = (!leftAligned) ? width - (timeWidth + 5) : 5;
-                fontRenderer.drawString(timeString, timeX, 35, 0xFFFFFF, true);
-            }
+                double timeElapsed = (newTime - time) / 1000.0;
+                VoxylUtils.drawText("Time elapsed: " + df.format(timeElapsed), leftAligned);
 
-            if (startingX != null) {
-                double diff = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
-                double thing =((diff) / 175) * 100;
-                if (thing > 100) {
-                    thing = 100;
-                }
-                if (thing < 0) {
-                    thing = 0;
-                }
-                String percentageDoneString = "Percentage done: " + df.format(thing);
-                int percentageDoneWidth = fontRenderer.getStringWidth(percentageDoneString);
-                int percentageDoneX = (!leftAligned) ? width - (percentageDoneWidth + 5) : 5;
-                fontRenderer.drawString(percentageDoneString, percentageDoneX, 50, 0xFFFFFF, true);
+                if (startingX != null) {
+                    double diff = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
+                    double pDone = VoxylUtils.clamp(diff / 175 * 100, 0, 100);
+                    VoxylUtils.drawText("Percentage done: " + df.format(pDone), leftAligned);
 
-                if (time != null && newTime != null) {
-                    try {
-                        double timeElapsed = (newTime - time) / 1000.0;
-                        double distanceTraveled = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
-
-                        double estimatedArrival = timeElapsed/(distanceTraveled/175);
-                        String estimatedArrivalString = (0 >= estimatedArrival || Double.isInfinite(estimatedArrival))
-                                ? "Will arrive in 3-5 business days"
-                                : ("Estimated arrival: " + df.format(estimatedArrival));
-                        int estimatedArrivalWidth = fontRenderer.getStringWidth(estimatedArrivalString);
-                        int estimatedArrivalX = (!leftAligned) ? width - (estimatedArrivalWidth + 5) : 5;
-                        fontRenderer.drawString(estimatedArrivalString, estimatedArrivalX, 65, 0xFFFFFF, true);
-                    } catch (Exception ignored) {}
+                    double distanceTraveled = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
+                    double estimatedArrival = timeElapsed/(distanceTraveled/175);
+                    if (!(0 >= estimatedArrival || Double.isInfinite(estimatedArrival)) && (!stopGrowingTime)) {
+                        VoxylUtils.drawText("Estimated arrival: " + df.format(estimatedArrival), leftAligned);
+                    } else {
+                        VoxylUtils.drawText("Personal best: " + df.format(pbTime), leftAligned);
+                    }
                 }
             }
         }
