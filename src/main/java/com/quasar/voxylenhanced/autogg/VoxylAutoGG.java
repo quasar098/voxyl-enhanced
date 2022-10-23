@@ -35,6 +35,10 @@ public class VoxylAutoGG extends VoxylFeature {
     }
 
     public static void handleCommand(String[] args) {
+        if (args.length == 1) {
+            VoxylUtils.informPlayer("/ve autogg <toggle|togglekills>");
+            return;
+        }
         if (args[1].equals("toggle")) {
             toggled = !toggled;
             VoxylUtils.informPlayer("Toggled obstacles functionality " + (toggled ? "on" : "off"));

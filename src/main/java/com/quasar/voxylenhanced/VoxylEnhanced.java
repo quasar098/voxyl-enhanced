@@ -3,6 +3,7 @@ package com.quasar.voxylenhanced;
 import com.google.common.collect.Lists;
 import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
+import com.quasar.voxylenhanced.obstacles.VoxylObstaclesKeybindList;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -22,7 +23,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.1.3";
 
     public static String apiKey = "missing";
 
@@ -34,10 +35,14 @@ public class VoxylEnhanced
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        MinecraftForge.EVENT_BUS.register(new VoxylEnhancedMainListener());
+        VoxylObstaclesKeybindList.register();
+
         for (VoxylFeature listener : listeners) {
             MinecraftForge.EVENT_BUS.register(listener);
         }
+
+        MinecraftForge.EVENT_BUS.register(new VoxylEnhancedMainListener());
+        MinecraftForge.EVENT_BUS.register(new VoxylInputHandler());
         ClientCommandHandler.instance.registerCommand(new VoxylEnhancedCommand());
     }
 

@@ -10,11 +10,13 @@ import com.quasar.voxylenhanced.VoxylUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.input.Mouse;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -39,7 +41,12 @@ public class VoxylObstacles extends VoxylFeature {
     public static Long time = null;
     public static Long newTime = null;
     public static boolean stopGrowingTime = false;
-    public static double pbTime = 1440;
+
+    // quick reset
+    public static boolean qrOpeningFirst = false;
+    public static int qrOpenFirst = 0;
+    public static boolean qrOpeningSecond = false;
+    public static int qrOpenSecond = 0;
 
     // other
     public static boolean isInObstacles = false;
@@ -53,20 +60,21 @@ public class VoxylObstacles extends VoxylFeature {
     public void configurate(Configuration config, boolean loadFromFile) {
         Property toggledProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-toggled", true, "Is obstacles UI on or not");
         Property leftAlignedProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-leftAligned", false, "Is UI left aligned instead of right aligned");
-        Property pbTimeProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-pb", 1440, "personal best time");
 
         if (loadFromFile) {
             toggled = toggledProp.getBoolean();
             leftAligned = leftAlignedProp.getBoolean();
-            pbTime = pbTimeProp.getDouble();
         } else {
             leftAlignedProp.set(leftAligned);
             toggledProp.set(toggled);
-            pbTimeProp.set(pbTime);
         }
     }
 
     public static void handleCommand(String[] args) {
+        if (args.length == 1) {
+            VoxylUtils.informPlayer("/ve obstacles <toggle|alignment>");
+            return;
+        }
         if (args[1].equals("toggle")) {
             toggled = !toggled;
             VoxylUtils.informPlayer("Toggled obstacles functionality " + (toggled ? "on" : "off"));
@@ -100,6 +108,7 @@ public class VoxylObstacles extends VoxylFeature {
         Pattern pattern = Pattern.compile("%username% fell into the void\\.$".replace("%username%", getStringUsername()));
         if (pattern.matcher(event.message.getUnformattedText()).find()) {
             deathCount += 1;
+            restartPrivateGame();
         }
 
         // check to see if player in obstacles
@@ -130,15 +139,6 @@ public class VoxylObstacles extends VoxylFeature {
         Pattern stopGrowPattern = Pattern.compile("^Total time was.*:.*$");
         if (stopGrowPattern.matcher(event.message.getUnformattedText()).find()) {
             stopGrowingTime = true;
-            double replaceTime = VoxylUtils.getIntBetween(event.message.getUnformattedText(), "s ", ":")*60;
-            replaceTime += VoxylUtils.getIntBetween(event.message.getUnformattedText(), ":", ".");
-            replaceTime += VoxylUtils.getIntAfter(event.message.getUnformattedText(), ".")/1000f;
-            if (replaceTime < pbTime) {
-                pbTime = replaceTime;
-                VoxylUtils.informPlayer(EnumChatFormatting.GRAY, "New PB!");
-                VoxylEnhanced.configurate(false);
-            }
-            newTime = new Double(replaceTime).longValue() + time;
         }
     }
     public void attemptMakeApiRequest() {
@@ -204,6 +204,22 @@ public class VoxylObstacles extends VoxylFeature {
         } catch (Exception err) { err.printStackTrace(); }
     }
 
+    public static boolean isInSingleplayer() {
+        return opponentWins.equals("No opponent");
+    }
+
+    public static void restartPrivateGame() {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc == null) {
+            return;
+        }
+        if (!isInSingleplayer()) {
+            return;
+        }
+        mc.thePlayer.sendChatMessage("/pg");
+        qrOpeningFirst = true;
+    }
+
     @SubscribeEvent
     public void tickEvent(TickEvent.PlayerTickEvent event) {
         inObstaclesTickDelay -= 1;
@@ -213,6 +229,72 @@ public class VoxylObstacles extends VoxylFeature {
         if (inObstaclesTickDelay == 0) {
             attemptMakeApiRequest();
             startingX = Math.toIntExact(Math.round(Minecraft.getMinecraft().thePlayer.posX));
+        }
+
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc == null) {
+            return;
+        }
+        if (mc.thePlayer == null) {
+            return;
+        }
+        if (mc.thePlayer.openContainer == null) {
+            qrOpeningSecond = false;
+            return;
+        }
+
+        if (qrOpenFirst != 0) {
+            qrOpenFirst += 1;
+            if (qrOpenFirst > 4) {
+                mc.playerController.windowClick(
+                        mc.thePlayer.openContainer.windowId, 24,
+                        0,
+                        0,
+                        mc.thePlayer
+                );
+                qrOpenFirst = 0;
+                qrOpeningSecond = true;
+            }
+        }
+        if (qrOpeningSecond) {
+            if (mc.thePlayer.openContainer.getSlot(25) != null) {
+                if (mc.thePlayer.openContainer.getSlot(25).getHasStack()) {
+                    qrOpenSecond = 1;
+                    qrOpeningSecond = false;
+                }
+            }
+        }
+        if (qrOpenSecond != 0) {
+            qrOpenSecond += 1;
+            if (qrOpenSecond > 2) {
+                mc.playerController.windowClick(
+                        mc.thePlayer.openContainer.windowId, 25,
+                        0,
+                        0,
+                        mc.thePlayer
+                );
+                qrOpenSecond = 0;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void guiOpenEvent(GuiOpenEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc == null) {
+            return;
+        }
+        if (mc.thePlayer == null) {
+            return;
+        }
+        if (mc.thePlayer.openContainer == null) {
+            return;
+            // null safety is a pain
+        }
+        if (qrOpeningFirst) {
+            System.out.println("First init");
+            qrOpenFirst = 1;
+            qrOpeningFirst = false;
         }
     }
 
@@ -243,8 +325,6 @@ public class VoxylObstacles extends VoxylFeature {
                     double estimatedArrival = timeElapsed/(distanceTraveled/175);
                     if (!(0 >= estimatedArrival || Double.isInfinite(estimatedArrival)) && (!stopGrowingTime)) {
                         VoxylUtils.drawText("Estimated arrival: " + df.format(estimatedArrival), leftAligned);
-                    } else {
-                        VoxylUtils.drawText("Personal best: " + df.format(pbTime), leftAligned);
                     }
                 }
             }
