@@ -47,6 +47,7 @@ public class VoxylObstacles extends VoxylFeature {
     public static int qrOpenFirst = 0;
     public static boolean qrOpeningSecond = false;
     public static int qrOpenSecond = 0;
+    public static boolean autoRQToggled = false;
 
     // other
     public static boolean isInObstacles = false;
@@ -59,20 +60,23 @@ public class VoxylObstacles extends VoxylFeature {
     @Override
     public void configurate(Configuration config, boolean loadFromFile) {
         Property toggledProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-toggled", true, "Is obstacles UI on or not");
+        Property autoRQProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-autoRQ", false, "Automatically Requeue Singleplayer matches on death");
         Property leftAlignedProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-leftAligned", false, "Is UI left aligned instead of right aligned");
 
         if (loadFromFile) {
+            autoRQToggled = autoRQProp.getBoolean();
             toggled = toggledProp.getBoolean();
             leftAligned = leftAlignedProp.getBoolean();
         } else {
             leftAlignedProp.set(leftAligned);
+            autoRQProp.set(autoRQToggled);
             toggledProp.set(toggled);
         }
     }
 
     public static void handleCommand(String[] args) {
         if (args.length == 1) {
-            VoxylUtils.informPlayer("/ve obstacles <toggle|alignment>");
+            VoxylUtils.informPlayer("/ve obstacles <toggle|alignment|autorequeue>");
             return;
         }
         if (args[1].equals("toggle")) {
@@ -85,7 +89,13 @@ public class VoxylObstacles extends VoxylFeature {
             VoxylUtils.informPlayer("Set alignment to " + (leftAligned ? "left" : "right"));
             return;
         }
-        VoxylUtils.informPlayer("/ve obstacles <toggle|alignment>");
+        if (args[1].equals("autorequeue")) {
+            autoRQToggled = !autoRQToggled;
+            VoxylUtils.informPlayer(
+                    "Singleplayer auto requeue functionality " + (autoRQToggled ? "on" : "off"));
+            return;
+        }
+        VoxylUtils.informPlayer("/ve obstacles <toggle|alignment|autorequeue>");
     }
 
     public static String getStringUsername() {
@@ -108,7 +118,9 @@ public class VoxylObstacles extends VoxylFeature {
         Pattern pattern = Pattern.compile("%username% fell into the void\\.$".replace("%username%", getStringUsername()));
         if (pattern.matcher(event.message.getUnformattedText()).find()) {
             deathCount += 1;
-            restartPrivateGame();
+            if (autoRQToggled) {
+                restartPrivateGame();
+            }
         }
 
         // check to see if player in obstacles
