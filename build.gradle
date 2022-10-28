@@ -15,6 +15,7 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
     }
 }
+
 apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
@@ -32,6 +33,7 @@ compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 }
+
 minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"
@@ -45,7 +47,15 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+repositories {
+    maven {
+        url = "https://repo.sk1er.club/repository/maven-public"
+    }
+}
+
 dependencies {
+    compile "gg.essential:vigilance-1.8.9-forge:223"
+
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
@@ -66,6 +76,7 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
     compile files('libs/async-http-client.jar')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
