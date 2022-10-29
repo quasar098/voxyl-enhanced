@@ -10,11 +10,11 @@
 - obstacles keybind to enter new singleplayer
 - keybind to go to /hub at any given moment
 
-### command aliases:
+### other things:
 
-/ve
+`/ve` is an alias of `/voxylenhanced`
 
-/voxylenhanced
+i used [vigilance](https://github.com/EssentialGG/Vigilance) to make the nice ui
 
 ### allowed on voxyl network?
 

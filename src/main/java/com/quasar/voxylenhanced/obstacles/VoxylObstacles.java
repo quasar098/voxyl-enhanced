@@ -6,17 +6,14 @@ import com.mb3364.http.AsyncHttpClient;
 import com.mb3364.http.StringHttpResponseHandler;
 import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
+import com.quasar.voxylenhanced.VoxylSettingsPage;
 import com.quasar.voxylenhanced.VoxylUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.lwjgl.input.Mouse;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -26,10 +23,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class VoxylObstacles extends VoxylFeature {
-
-    // settings
-    public static boolean toggled = true;
-    public static boolean leftAligned = false;
 
     // opponent win stats
     public static AsyncHttpClient client = new AsyncHttpClient();
@@ -47,7 +40,6 @@ public class VoxylObstacles extends VoxylFeature {
     public static int qrOpenFirst = 0;
     public static boolean qrOpeningSecond = false;
     public static int qrOpenSecond = 0;
-    public static boolean autoRQToggled = false;
 
     // other
     public static boolean isInObstacles = false;
@@ -56,47 +48,6 @@ public class VoxylObstacles extends VoxylFeature {
     public static Integer startingX = null;
     public static int deathCount = 0;
     public static HashMap<String, Integer> winsMap = new HashMap<>();
-
-    @Override
-    public void configurate(Configuration config, boolean loadFromFile) {
-        Property toggledProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-toggled", true, "Is obstacles UI on or not");
-        Property autoRQProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-autoRQ", false, "Automatically Requeue Singleplayer matches on death");
-        Property leftAlignedProp = config.get(Configuration.CATEGORY_CLIENT, "obstacles-leftAligned", false, "Is UI left aligned instead of right aligned");
-
-        if (loadFromFile) {
-            autoRQToggled = autoRQProp.getBoolean();
-            toggled = toggledProp.getBoolean();
-            leftAligned = leftAlignedProp.getBoolean();
-        } else {
-            leftAlignedProp.set(leftAligned);
-            autoRQProp.set(autoRQToggled);
-            toggledProp.set(toggled);
-        }
-    }
-
-    public static void handleCommand(String[] args) {
-        if (args.length == 1) {
-            VoxylUtils.informPlayer("/ve obstacles <toggle|alignment|autorequeue>");
-            return;
-        }
-        if (args[1].equals("toggle")) {
-            toggled = !toggled;
-            VoxylUtils.informPlayer("Toggled obstacles functionality " + (toggled ? "on" : "off"));
-            return;
-        }
-        if (args[1].equals("alignment")) {
-            leftAligned = !leftAligned;
-            VoxylUtils.informPlayer("Set alignment to " + (leftAligned ? "left" : "right"));
-            return;
-        }
-        if (args[1].equals("autorequeue")) {
-            autoRQToggled = !autoRQToggled;
-            VoxylUtils.informPlayer(
-                    "Singleplayer auto requeue functionality " + (autoRQToggled ? "on" : "off"));
-            return;
-        }
-        VoxylUtils.informPlayer("/ve obstacles <toggle|alignment|autorequeue>");
-    }
 
     public static String getStringUsername() {
         // this will ALWAYS return a string
@@ -118,7 +69,7 @@ public class VoxylObstacles extends VoxylFeature {
         Pattern pattern = Pattern.compile("%username% fell into the void\\.$".replace("%username%", getStringUsername()));
         if (pattern.matcher(event.message.getUnformattedText()).find()) {
             deathCount += 1;
-            if (autoRQToggled) {
+            if (VoxylEnhanced.settings.obstaclesAutoRequeue) {
                 restartPrivateGame();
             }
         }
@@ -169,7 +120,7 @@ public class VoxylObstacles extends VoxylFeature {
         try {
 
             // if api key is not there, ask player to set it
-            if (VoxylEnhanced.apiKey.equals("missing")) {
+            if (VoxylEnhanced.settings.apiKey.equals("")) {
                 VoxylUtils.informPlayer("You need to set your api key for the Voxyl Enhanced mod to work properly!");
                 opponentWins = "API Key missing!";
                 return;
@@ -180,7 +131,7 @@ public class VoxylObstacles extends VoxylFeature {
                 UUID id = Minecraft.getMinecraft().theWorld.getPlayerEntityByName(opponentName).getUniqueID();
 
                 // make async api request
-                String url = "http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + VoxylEnhanced.apiKey;
+                String url = "http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + VoxylEnhanced.settings.apiKey;
                 client.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
                 client.setConnectionTimeout(3000);
                 client.get(url, new StringHttpResponseHandler() {
@@ -315,7 +266,8 @@ public class VoxylObstacles extends VoxylFeature {
         if (!stopGrowingTime) {
             newTime = System.currentTimeMillis();
         }
-        if (isInObstacles && toggled) {
+        if (isInObstacles && VoxylEnhanced.settings.obstaclesToggled) {
+            boolean leftAligned = VoxylEnhanced.settings.obstaclesLeftAligned;
             VoxylUtils.textY = 5;
 
             // death count

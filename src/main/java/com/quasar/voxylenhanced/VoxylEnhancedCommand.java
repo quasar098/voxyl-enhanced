@@ -1,16 +1,11 @@
 package com.quasar.voxylenhanced;
 
 import com.google.common.collect.Lists;
-import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
-import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class VoxylEnhancedCommand extends CommandBase {
@@ -57,36 +52,15 @@ public class VoxylEnhancedCommand extends CommandBase {
     @SuppressWarnings("RedundantThrows")
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        if (args.length == 0) commandHelpMessage();
-        else if (args[0].equals("key")) {
-            handleApiKeyCommand(args);
-        } else if (args[0].equals("autogg")) {
-            VoxylAutoGG.handleCommand(args);
-        } else if (args[0].equals("obstacles")) {
-            VoxylObstacles.handleCommand(args);
+        if (args.length == 0) {
+            VoxylEnhanced.willOpenSettings = true;
+        } else if (args.length == 1) {
+            VoxylEnhanced.settings.apiKey = args[0];
+            messageResponse(String.format("Set api key to %s", VoxylEnhanced.settings.apiKey));
         } else commandHelpMessage();
-        VoxylEnhanced.configurate(false);
-    }
-
-    public void handleApiKeyCommand(String[] args) {
-        if (args.length > 2) {
-            commandHelpMessage();
-            return;
-        }
-        if (args.length == 2) {
-            try {
-                VoxylEnhanced.apiKey = args[1];
-                messageResponse(String.format("Set api key to %s", VoxylEnhanced.apiKey));
-            } catch (Error ignored) {
-                commandHelpMessage();
-            }
-        }
-        if (args.length == 1) {
-            messageResponse("Your api key is " + VoxylEnhanced.apiKey);
-        }
     }
 
     public void commandHelpMessage() {
-        messageResponse("/ve <obstacles|autogg|key> ...");
+        messageResponse("/ve");
     }
 }

@@ -3,17 +3,16 @@ package com.quasar.voxylenhanced;
 import com.google.common.collect.Lists;
 import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.File;
 import java.util.List;
@@ -22,9 +21,11 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.1.4";
+    public static final String VERSION = "0.2.0";
 
-    public static String apiKey = "missing";
+    public static boolean willOpenSettings = false;
+
+    public static VoxylSettingsPage settings;
 
     static List<VoxylFeature> listeners = Lists.newArrayList(
             new VoxylObstacles(),
@@ -47,33 +48,7 @@ public class VoxylEnhanced
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) {
-        File configFile = new File(Loader.instance().getConfigDir(), "voxylenhanced.cfg");
-        config = new Configuration(configFile);
-        configurate(true);
-    }
-
-    private static Configuration config = null;
-
-    public static void configurate(boolean loadFromFile) {
-        if (loadFromFile) {
-            config.load();
-        }
-
-        Property apiKeyProp = config.get(Configuration.CATEGORY_CLIENT, "apiKey", "missing", "api key of bwp");
-
-        if (loadFromFile) {
-            apiKey = apiKeyProp.getString();
-        } else {
-            apiKeyProp.set(apiKey);
-        }
-
-        for (VoxylFeature listener : listeners) {
-            listener.configurate(config, loadFromFile);
-        }
-
-        if (config.hasChanged()) {
-            config.save();
-        }
+        settings = new VoxylSettingsPage(new File("./config/voxylenhanced.toml"));
     }
 
     @SuppressWarnings("InnerClassMayBeStatic")
@@ -82,6 +57,14 @@ public class VoxylEnhanced
         public void worldLoad(WorldEvent.Load event) {
             for (VoxylFeature listener : listeners) {
                 listener.reset();
+            }
+        }
+
+        @SubscribeEvent
+        public void renderTick(TickEvent.RenderTickEvent e) {
+            if (willOpenSettings) {
+                Minecraft.getMinecraft().displayGuiScreen(settings.gui());
+                willOpenSettings = false;
             }
         }
     }
