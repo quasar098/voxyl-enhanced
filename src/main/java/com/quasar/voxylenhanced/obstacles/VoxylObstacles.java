@@ -102,6 +102,12 @@ public class VoxylObstacles extends VoxylFeature {
         Pattern stopGrowPattern = Pattern.compile("^Total time was.*:.*$");
         if (stopGrowPattern.matcher(event.message.getUnformattedText()).find()) {
             stopGrowingTime = true;
+
+            long calcNewTime = time;
+            calcNewTime += (long) VoxylUtils.getIntBetween(event.message.getUnformattedText(), "was ", ":")*60000;
+            calcNewTime += (long) VoxylUtils.getIntBetween(event.message.getUnformattedText(), ":", ".")*1000;
+            calcNewTime += (long) VoxylUtils.getIntAfter(event.message.getUnformattedText(), ".");
+            newTime = calcNewTime;
         }
     }
     public void attemptMakeApiRequest() {
@@ -283,7 +289,7 @@ public class VoxylObstacles extends VoxylFeature {
                 if (startingX != null) {
                     double diff = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
                     double pDone = VoxylUtils.clamp(diff / 175 * 100, 0, 100);
-                    VoxylUtils.drawText("Percentage done: " + df.format(pDone), leftAligned);
+                    VoxylUtils.drawText("Percentage done: " + df.format(stopGrowingTime ? 100 : pDone), leftAligned);
 
                     double distanceTraveled = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
                     double estimatedArrival = timeElapsed/(distanceTraveled/175);
