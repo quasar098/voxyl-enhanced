@@ -274,30 +274,31 @@ public class VoxylObstacles extends VoxylFeature {
         }
         if (isInObstacles && VoxylEnhanced.settings.obstaclesToggled) {
             boolean leftAligned = VoxylEnhanced.settings.obstaclesLeftAligned;
+            int spac = VoxylEnhanced.settings.obstaclesSpacing;
 
             // death count
             VoxylUtils.drawText("Death count: " + deathCount, leftAligned, 5);
 
             // opponent wins
-            VoxylUtils.drawText("Opponent win stats: " + opponentWins, leftAligned, 20);
+            VoxylUtils.drawText("Opponent win stats: " + opponentWins, leftAligned, 5+(10 + spac));
 
             if (time != null && newTime != null) {
 
                 // time elapsed
                 double timeElapsed = (newTime - time) / 1000.0;
-                VoxylUtils.drawText("Time elapsed: " + df.format(timeElapsed), leftAligned, 35);
+                VoxylUtils.drawText("Time elapsed: " + df.format(timeElapsed), leftAligned, 5+((10+spac)*2));
 
                 if (startingX != null) {
 
                     // percentage done
                     double diff = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
                     double pDone = VoxylUtils.clamp(diff / 175 * 100, 0, 100);
-                    VoxylUtils.drawText("Percentage done: " + df.format(stopGrowingTime ? 100 : pDone), leftAligned, 50);
+                    VoxylUtils.drawText("Percentage done: " + df.format(stopGrowingTime ? 100 : pDone), leftAligned, 5+((10+spac)*3));
 
                     // estimated arrival
                     double estimatedArrival = timeElapsed/(Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX)/175);
                     if (!(0 >= estimatedArrival || Double.isInfinite(estimatedArrival)) && (!stopGrowingTime)) {
-                        VoxylUtils.drawText("Estimated arrival: " + df.format(estimatedArrival), leftAligned, 65);
+                        VoxylUtils.drawText("Estimated arrival: " + df.format(estimatedArrival), leftAligned, 5+((10+spac)*4));
                     }
                 }
             }

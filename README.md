@@ -8,7 +8,8 @@
 - obstacles opponent win stats \(gauge opponent strength\)
 - obstacles auto requeue after death in singleplayer
 - obstacles keybind to enter new singleplayer
-- keybind to go to /hub at any given moment
+- list the stats of players in your game
+- keybind to `/hub` at any given moment
 
 ### other things:
 
@@ -19,3 +20,8 @@ i used [vigilance](https://github.com/EssentialGG/Vigilance) to make the nice ui
 ### allowed on voxyl network?
 
 maybe
+
+### todo:
+
+- moveable elements draggable anywhere
+- levelhead for stats viewer

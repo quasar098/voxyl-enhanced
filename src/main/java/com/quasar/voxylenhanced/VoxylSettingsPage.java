@@ -58,6 +58,16 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean obstaclesAutoRequeue = false;
 
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Spacing",
+            description = "Spacing between list entries",
+            min = 1,
+            max = 10,
+            category = "Obstacles"
+    )
+    public int obstaclesSpacing = 3;
+
     // autogg
 
     @Property(
@@ -85,13 +95,79 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public int autoggMinKillsForKillCount = 5;
 
+    // stats viewer
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Toggled",
+            description = "Whether stats viewer is toggled on or not",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerToggled = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Left Aligned",
+            description = "Should the stats viewer be left or right aligned",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerLeftAligned = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Cache UUIDS",
+            description = "I recommend keeping this on",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerCacheUUIDS = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show Own Name",
+            description = "Should the list include your name",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerShowOwnName = false;
+
+    @Property(
+            type = PropertyType.SELECTOR,
+            name = "Sorting Behavior",
+            description = "How should the list be sorted?",
+            options = {
+                    "Alphabetical",
+                    "Stars",
+                    "Weighted Wins"
+            },
+            category = "Stats Viewer"
+    )
+    public int statsViewerSortOrder = 0;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Spacing",
+            description = "Spacing between list entries",
+            min = 1,
+            max = 10,
+            category = "Stats Viewer"
+    )
+    public int statsViewerSpacing = 3;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Show First Line",
+            description = "Show the \"Name | Stars | Weighted Wins\" message",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerShowFirstLine = true;
+
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());
 
         initialize();
 
         setCategoryDescription("General", "Random stuff here and there");
-        setCategoryDescription("Obstacles", "The obstacles gamemode");
         setCategoryDescription("Auto GG", "Say 'gg' after each game");
+        setCategoryDescription("Obstacles", "The obstacles gamemode");
+        setCategoryDescription("Stats Viewer", "List the stats of players in your game");
     }
 }

@@ -9,6 +9,8 @@ import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.UUID;
+
 public class VoxylUtils {
 
     // send chat message
@@ -23,6 +25,14 @@ public class VoxylUtils {
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(String.join("\n", strings))
                     .setChatStyle(new ChatStyle().setColor(color)));
         }
+    }
+
+    public static UUID getUUIDfromStringWithoutDashes(String withoutDashes) {
+        return java.util.UUID.fromString(
+            withoutDashes.replaceFirst(
+                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
+            )
+        );
     }
 
     // integer extraction from string
