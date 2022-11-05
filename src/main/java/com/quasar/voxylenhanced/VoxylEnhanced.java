@@ -3,6 +3,7 @@ package com.quasar.voxylenhanced;
 import com.google.common.collect.Lists;
 import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
+import com.quasar.voxylenhanced.statsviewer.VoxylStatsViewer;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,13 +30,14 @@ public class VoxylEnhanced
 
     static List<VoxylFeature> listeners = Lists.newArrayList(
             new VoxylObstacles(),
-            new VoxylAutoGG()
+            new VoxylAutoGG(),
+            new VoxylStatsViewer()
     );
     
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        VoxylKeybinds.register();
+        VoxylInputHandler.register();
         MinecraftForge.EVENT_BUS.register(new VoxylInputHandler());
 
         for (VoxylFeature listener : listeners) {

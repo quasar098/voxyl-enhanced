@@ -37,14 +37,13 @@ public class VoxylUtils {
 
     // rendering text
 
-    public static int textY = 5;
     public static FontRenderer fr;
 
-    public static void drawText(String str, boolean leftAlignment) {
-        drawText(str, leftAlignment, 0xFFFFFF);
+    public static void drawText(String str, boolean leftAlignment, int textY) {
+        drawText(str, leftAlignment, 0xFFFFFF, textY);
     }
 
-    public static void drawText(String str, boolean leftAlignment, int col) {
+    public static void drawText(String str, boolean leftAlignment, int col, int textY) {
         updateFontRenderer();
         ScaledResolution var5 = new ScaledResolution(Minecraft.getMinecraft());
         int width = var5.getScaledWidth();

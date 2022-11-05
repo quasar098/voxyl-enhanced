@@ -274,27 +274,30 @@ public class VoxylObstacles extends VoxylFeature {
         }
         if (isInObstacles && VoxylEnhanced.settings.obstaclesToggled) {
             boolean leftAligned = VoxylEnhanced.settings.obstaclesLeftAligned;
-            VoxylUtils.textY = 5;
 
             // death count
-            VoxylUtils.drawText("Death count: " + deathCount, leftAligned);
+            VoxylUtils.drawText("Death count: " + deathCount, leftAligned, 5);
 
             // opponent wins
-            VoxylUtils.drawText("Opponent win stats: " + opponentWins, leftAligned);
+            VoxylUtils.drawText("Opponent win stats: " + opponentWins, leftAligned, 20);
 
             if (time != null && newTime != null) {
+
+                // time elapsed
                 double timeElapsed = (newTime - time) / 1000.0;
-                VoxylUtils.drawText("Time elapsed: " + df.format(timeElapsed), leftAligned);
+                VoxylUtils.drawText("Time elapsed: " + df.format(timeElapsed), leftAligned, 35);
 
                 if (startingX != null) {
+
+                    // percentage done
                     double diff = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
                     double pDone = VoxylUtils.clamp(diff / 175 * 100, 0, 100);
-                    VoxylUtils.drawText("Percentage done: " + df.format(stopGrowingTime ? 100 : pDone), leftAligned);
+                    VoxylUtils.drawText("Percentage done: " + df.format(stopGrowingTime ? 100 : pDone), leftAligned, 50);
 
-                    double distanceTraveled = Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX);
-                    double estimatedArrival = timeElapsed/(distanceTraveled/175);
+                    // estimated arrival
+                    double estimatedArrival = timeElapsed/(Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX)/175);
                     if (!(0 >= estimatedArrival || Double.isInfinite(estimatedArrival)) && (!stopGrowingTime)) {
-                        VoxylUtils.drawText("Estimated arrival: " + df.format(estimatedArrival), leftAligned);
+                        VoxylUtils.drawText("Estimated arrival: " + df.format(estimatedArrival), leftAligned, 65);
                     }
                 }
             }

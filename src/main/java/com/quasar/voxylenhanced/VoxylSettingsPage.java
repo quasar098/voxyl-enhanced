@@ -2,11 +2,11 @@ package com.quasar.voxylenhanced;
 
 import com.quasar.voxylenhanced.misc.VoxylMisc;
 import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.Property;
-import gg.essential.vigilance.data.PropertyType;
+import gg.essential.vigilance.data.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Comparator;
 
 public class VoxylSettingsPage extends Vigilant {
 
@@ -86,7 +86,7 @@ public class VoxylSettingsPage extends Vigilant {
     public int autoggMinKillsForKillCount = 5;
 
     public VoxylSettingsPage(@NotNull File file) {
-        super(file);
+        super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());
 
         initialize();
 
