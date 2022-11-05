@@ -19,22 +19,6 @@ public class VoxylEnhancedCommand extends CommandBase {
         return "voxylenhanced usage here";
     }
 
-
-    @Override
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        if (args.length == 1) {
-            return Lists.newArrayList("obstacles", "autogg");
-        } else if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("obstacles")) {
-                return Lists.newArrayList("toggle", "alignment");
-            }
-            if (args[0].equalsIgnoreCase("autogg")) {
-                return Lists.newArrayList("toggle", "togglekills");
-            }
-        }
-        return null;
-    }
-
     @Override
     public List<String> getCommandAliases() {
         return Lists.newArrayList("ve", "voxylenhanced");
