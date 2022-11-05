@@ -74,6 +74,17 @@ public class VoxylStatsViewer extends VoxylFeature {
             waitingForGameStart = true;
         }
 
+        Pattern doSort = Pattern.compile("^Game Starting in 2 seconds!$");
+        if (doSort.matcher(event.message.getUnformattedText()).find()) {
+            if (VoxylEnhanced.settings.statsViewerSortOrder == 0) {
+                stats.sort(Comparator.comparing(u -> u.name));
+            } else if (VoxylEnhanced.settings.statsViewerSortOrder == 1) {
+                stats.sort(Comparator.comparingInt(u -> -u.stars));
+            } else {
+                stats.sort(Comparator.comparingInt(u -> -u.weightedWins));
+            }
+        }
+
         Pattern gameStart = Pattern.compile("^Game starting in 4 seconds!$");
         if (gameStart.matcher(event.message.getUnformattedText()).find()) {
             currentlyInGame = true;
@@ -99,14 +110,6 @@ public class VoxylStatsViewer extends VoxylFeature {
                             }
                             if (weightedwins != null) {
                                 stats.get(finalIndex).weightedWins = weightedwins.getAsInt();
-                            }
-
-                            if (VoxylEnhanced.settings.statsViewerSortOrder == 0) {
-                                stats.sort(Comparator.comparing(u -> u.name));
-                            } else if (VoxylEnhanced.settings.statsViewerSortOrder == 1) {
-                                stats.sort(Comparator.comparingInt(u -> -u.stars));
-                            } else {
-                                stats.sort(Comparator.comparingInt(u -> -u.weightedWins));
                             }
 
                         } catch (Exception e) { e.printStackTrace(); }
