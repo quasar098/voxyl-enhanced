@@ -74,7 +74,7 @@ public class VoxylStatsViewer extends VoxylFeature {
             waitingForGameStart = true;
         }
 
-        Pattern doSort = Pattern.compile("^Game Starting in 2 seconds!$");
+        Pattern doSort = Pattern.compile("^Game starting in 2 seconds!$");
         if (doSort.matcher(event.message.getUnformattedText()).find()) {
             if (VoxylEnhanced.settings.statsViewerSortOrder == 0) {
                 stats.sort(Comparator.comparing(u -> u.name));
