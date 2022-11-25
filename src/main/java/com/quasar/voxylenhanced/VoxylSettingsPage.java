@@ -273,6 +273,30 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean hideMessageTwitter = true;
 
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Stats message",
+            description = "(!) Kills, beds broken, and wins are all added to your profile. Accessible via /stats.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageStats = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Report at hub message",
+            description = "(!) If you believe a player is hacking use /report to report them!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageReportAtHub = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Join discord message",
+            description = "(!) Join the discord server for updates! discord.gg/TUeUnkqXnY",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageDiscord = true;
+
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());
 

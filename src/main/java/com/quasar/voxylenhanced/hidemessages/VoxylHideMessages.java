@@ -23,6 +23,9 @@ public class VoxylHideMessages extends VoxylFeature {
     static Pattern pCompass = Pattern.compile("^\\(!\\) Join a game from listed from the compass!$");
     static Pattern pOutOfBounds = Pattern.compile("^You cannot travel out of bounds! You have been sent back to spawn\\.$");
     static Pattern pTwitter = Pattern.compile("^\\(!\\) Keep up with the twitter account for updates and giveaways at twitter\\.com/bedwarspractice$");
+    static Pattern pStats = Pattern.compile("^\\(!\\) Kills, beds broken, and wins are all added to your profile\\. Accessible via /stats\\.$");
+    static Pattern pReportAtHub = Pattern.compile("^\\(!\\) If you believe a player is hacking use /report to report them!$");
+    static Pattern pDiscord = Pattern.compile("^\\(!\\) Join the discord server for updates! discord\\.gg/TUeUnkqXnY$");
 
     // the settings for these are in VoxylSettingsPage
 
@@ -77,7 +80,7 @@ public class VoxylHideMessages extends VoxylFeature {
             }
         }
         if (VoxylEnhanced.settings.hideMessageRank) {
-            if (pReport.matcher(m).find()) {
+            if (pRank.matcher(m).find()) {
                 event.setCanceled(true);
             }
         }
@@ -96,6 +99,20 @@ public class VoxylHideMessages extends VoxylFeature {
                 event.setCanceled(true);
             }
         }
-
+        if (VoxylEnhanced.settings.hideMessageStats) {
+            if (pStats.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageReportAtHub) {
+            if (pReportAtHub.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageDiscord) {
+            if (pDiscord.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
     }
 }

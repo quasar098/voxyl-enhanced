@@ -30,7 +30,6 @@ public class VoxylStatsViewerSegment {
 
     public void useApi(AsyncHttpClient client, StringHttpResponseHandler handler) {
         try {
-            System.out.println("2!");
 
             if (name == null) {
                 name = "null";

@@ -9,6 +9,7 @@ import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
 import com.quasar.voxylenhanced.VoxylUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -24,10 +25,18 @@ public class VoxylStatsViewer extends VoxylFeature {
     List<VoxylStatsViewerSegment> stats = new ArrayList<>();
     boolean currentlyInGame = false;
     boolean waitingForGameStart = false;
+    boolean apiIsDown = false;
 
     @SuppressWarnings("ConstantConditions")
     @SubscribeEvent
     public void render(RenderGameOverlayEvent.Text event) {
+        if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().getCurrentServerData() == null) {
+            return;
+        }
+        if (!Minecraft.getMinecraft().getCurrentServerData().serverIP.equals("bedwarspractice.club")) {
+            return;
+        }
+
         if (!VoxylEnhanced.settings.statsViewerToggled) return;
 
         if (stats == null) {
@@ -53,6 +62,15 @@ public class VoxylStatsViewer extends VoxylFeature {
 
     @SubscribeEvent
     public void chatEvent(ClientChatReceivedEvent event) {
+        if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().getCurrentServerData() == null) {
+            return;
+        }
+        if (!Minecraft.getMinecraft().getCurrentServerData().serverIP.equals("bedwarspractice.club")) {
+            return;
+        }
+        if (apiIsDown) {
+            return;
+        }
         Pattern gameNamesMessage = Pattern.compile("^Players in this game:");
         if (gameNamesMessage.matcher(event.message.getUnformattedText()).find()) {
 
@@ -115,7 +133,13 @@ public class VoxylStatsViewer extends VoxylFeature {
                         } catch (Exception e) { e.printStackTrace(); }
                     }
                     @Override
-                    public void onFailure(int i, Map<String, List<String>> map, String s) { System.out.println("ERR: " + i); }
+                    public void onFailure(int i, Map<String, List<String>> map, String s) {
+                        System.out.println("ERR: " + i);
+                        if (i == 521) {
+                            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("The API is down! Tell Tom to fix it"));
+                            apiIsDown = true;
+                        }
+                    }
                     @Override
                     public void onFailure(Throwable throwable) { throwable.printStackTrace(); }
                 });

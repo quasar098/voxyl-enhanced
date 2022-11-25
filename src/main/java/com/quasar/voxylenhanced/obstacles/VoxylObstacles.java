@@ -65,6 +65,13 @@ public class VoxylObstacles extends VoxylFeature {
     @SubscribeEvent
     public void chatEvent(ClientChatReceivedEvent event) {
 
+        if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().getCurrentServerData() == null) {
+            return;
+        }
+        if (!Minecraft.getMinecraft().getCurrentServerData().serverIP.equals("bedwarspractice.club")) {
+            return;
+        }
+
         // death count
         Pattern pattern = Pattern.compile("%username% fell into the void\\.$".replace("%username%", getStringUsername()));
         if (pattern.matcher(event.message.getUnformattedText()).find()) {
