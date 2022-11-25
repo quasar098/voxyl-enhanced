@@ -2,7 +2,9 @@ package com.quasar.voxylenhanced;
 
 import com.google.common.collect.Lists;
 import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
+import com.quasar.voxylenhanced.hidemessages.VoxylHideMessages;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
+import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import com.quasar.voxylenhanced.statsviewer.VoxylStatsViewer;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -22,7 +24,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.3.1";
+    public static final String VERSION = "0.3.2";
 
     public static boolean willOpenSettings = false;
 
@@ -31,13 +33,15 @@ public class VoxylEnhanced
     static List<VoxylFeature> listeners = Lists.newArrayList(
             new VoxylObstacles(),
             new VoxylAutoGG(),
-            new VoxylStatsViewer()
+            new VoxylStatsViewer(),
+            new VoxylHideMessages()
     );
     
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
         VoxylInputHandler.register();
+        VoxylObstaclesSegments.init();
         MinecraftForge.EVENT_BUS.register(new VoxylInputHandler());
 
         for (VoxylFeature listener : listeners) {

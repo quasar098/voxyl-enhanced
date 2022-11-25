@@ -60,7 +60,6 @@ public class VoxylUtils {
         int tWidth = fr.getStringWidth(str);
         int tX = leftAlignment ? 5 : width - (tWidth + 5);
         fr.drawString(str, tX, textY, col, true);
-        textY += 15;
     }
 
     public static void updateFontRenderer() {

@@ -23,6 +23,21 @@ public class VoxylSettingsPage extends Vigilant {
     }
 
     @Property(
+            type = PropertyType.BUTTON,
+            name = "Obstacles Read Segments",
+            description = "Used for development purposes",
+            category = "General"
+    )
+    void obstaclesCollectData() {
+        VoxylMisc.obstaclesReadSegment(0);
+        VoxylMisc.obstaclesReadSegment(-15);
+        VoxylMisc.obstaclesReadSegment(-30);
+        VoxylMisc.obstaclesReadSegment(-45);
+        VoxylMisc.obstaclesReadSegment(-60);
+        VoxylMisc.obstaclesReadSegment(-75);
+    }
+
+    @Property(
             type = PropertyType.TEXT,
             name = "API Key",
             description = "Can also be set using /ve <key>",
@@ -160,6 +175,104 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean statsViewerShowFirstLine = true;
 
+    // hide messages
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Report message",
+            description = "If a player is cheating, please use /report to report them!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageReport = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Expert color message",
+            description = "(!) Expert rank can change their preferred team colour to non-standard teams.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageExpertColor = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Master color message",
+            description = "(!) Master rank after picking a preferred team colour can make the opposite team its complementary colour.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageMasterColor = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Leave message",
+            description = "(!) Leave your current session using /leave.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageLeave = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Obstacles message",
+            description = "(!) When placing blocks on the side of an obstacle, consider jumping before placing a block - continuing the momentum.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageObstaclesMomentum = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "No players message",
+            description = "There appears to be no players in your game. Please report this in the discord!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageNoPlayers = false;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Invite messages",
+            description = "> [Master] rarme has invited all lobby players to join the 2v2 Stick Fight queue!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageInvites = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Tools message",
+            description = "(!) You can change your tool positions with /tools for better practice!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageTools = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Buy rank message",
+            description = "(!) If you enjoy the server consider buying a rank! store.bedwarspractice.club",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageRank = false;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Join compass message",
+            description = "(!) Join a game from listed from the compass!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageCompass = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Out of spawn message",
+            description = "You cannot travel out of bounds! You have been sent back to spawn.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageOutOfBounds = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Twitter giveaways message",
+            description = "(!) Keep up with the twitter account for updates and giveaways at twitter.com/bedwarspractice",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageTwitter = true;
+
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());
 
@@ -169,5 +282,6 @@ public class VoxylSettingsPage extends Vigilant {
         setCategoryDescription("Auto GG", "Say 'gg' after each game");
         setCategoryDescription("Obstacles", "The obstacles gamemode");
         setCategoryDescription("Stats Viewer", "List the stats of players in your game");
+        setCategoryDescription("Hide Messages", "Hide repetitive messages sent by the server");
     }
 }
