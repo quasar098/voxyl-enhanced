@@ -26,6 +26,7 @@ public class VoxylHideMessages extends VoxylFeature {
     static Pattern pStats = Pattern.compile("^\\(!\\) Kills, beds broken, and wins are all added to your profile\\. Accessible via /stats\\.$");
     static Pattern pReportAtHub = Pattern.compile("^\\(!\\) If you believe a player is hacking use /report to report them!$");
     static Pattern pDiscord = Pattern.compile("^\\(!\\) Join the discord server for updates! discord\\.gg/TUeUnkqXnY$");
+    static Pattern pDiagonal = Pattern.compile("\\(!\\) It is recommended to practice diagonal bridging to complete the last segment of the course as fast as possible\\.$");
 
     // the settings for these are in VoxylSettingsPage
 
@@ -111,6 +112,11 @@ public class VoxylHideMessages extends VoxylFeature {
         }
         if (VoxylEnhanced.settings.hideMessageDiscord) {
             if (pDiscord.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageDiagonal) {
+            if (pDiagonal.matcher(m).find()) {
                 event.setCanceled(true);
             }
         }

@@ -35,6 +35,10 @@ public class VoxylSettingsPage extends Vigilant {
         VoxylMisc.obstaclesReadSegment(-45);
         VoxylMisc.obstaclesReadSegment(-60);
         VoxylMisc.obstaclesReadSegment(-75);
+        VoxylMisc.obstaclesReadSegment(-90);
+        VoxylMisc.obstaclesReadSegment(-105);
+        VoxylMisc.obstaclesReadSegment(-120);
+        VoxylMisc.obstaclesReadSegment(-135);
     }
 
     @Property(
@@ -211,7 +215,7 @@ public class VoxylSettingsPage extends Vigilant {
 
     @Property(
             type = PropertyType.CHECKBOX,
-            name = "Obstacles message",
+            name = "Obstacles momentum message",
             description = "(!) When placing blocks on the side of an obstacle, consider jumping before placing a block - continuing the momentum.",
             category = "Hide Messages"
     )
@@ -296,6 +300,14 @@ public class VoxylSettingsPage extends Vigilant {
             category = "Hide Messages"
     )
     public boolean hideMessageDiscord = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Obstacles diagonal message",
+            description = "(!) It is recommended to practice diagonal bridging to complete the last segment of the course as fast as possible.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageDiagonal = true;
 
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());

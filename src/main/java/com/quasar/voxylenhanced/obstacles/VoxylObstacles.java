@@ -8,6 +8,7 @@ import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
 import com.quasar.voxylenhanced.VoxylSettingsPage;
 import com.quasar.voxylenhanced.VoxylUtils;
+import com.quasar.voxylenhanced.misc.VoxylMisc;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -47,6 +48,7 @@ public class VoxylObstacles extends VoxylFeature {
     private static final DecimalFormat df = new DecimalFormat("0.00");
     public static Integer startingX = null;
     public static int deathCount = 0;
+    public static float speedScore = 0;
     public static HashMap<String, Integer> winsMap = new HashMap<>();
 
     public static String getStringUsername() {
@@ -103,6 +105,12 @@ public class VoxylObstacles extends VoxylFeature {
         // start the timer
         if (event.message.getUnformattedText().contains("Game starting in 5 seconds!")) {
             time = System.currentTimeMillis()+5000L;
+        }
+
+        // get superscore
+        Pattern gameNamesMessage = Pattern.compile("^Game starting in 1 second.?!");
+        if (gameNamesMessage.matcher(event.message.getUnformattedText()).find()) {
+            speedScore = VoxylMisc.getSpeedScore();
         }
 
         // stop the timer
@@ -309,6 +317,7 @@ public class VoxylObstacles extends VoxylFeature {
                     }
                 }
             }
+            VoxylUtils.drawText("Speed Score: " + df.format(speedScore), leftAligned, 5+((10+spac)*5));
         }
     }
 
@@ -322,5 +331,6 @@ public class VoxylObstacles extends VoxylFeature {
         stopGrowingTime = false;
         opponentWinsHasLoaded = false;
         startingX = null;
+        speedScore = 0;
     }
 }

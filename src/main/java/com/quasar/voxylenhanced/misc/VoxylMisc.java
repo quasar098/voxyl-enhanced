@@ -1,5 +1,7 @@
 package com.quasar.voxylenhanced.misc;
 
+import com.quasar.voxylenhanced.VoxylUtils;
+import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.state.IBlockState;
@@ -11,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.StringJoiner;
+
+import static com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments.*;
 
 public class VoxylMisc {
     public static void goToHub() {
@@ -45,18 +49,40 @@ public class VoxylMisc {
         }
     }
 
-    public static void obstaclesReadSegment(int offsetX) {
+    public static float getSpeedScore() {
+        float total = 0f;
+        for (int i = 0; i > -105; i-=15) {
+            Float add = obstaclesReadSegment(i);
+            if (add != null) {
+                total += add;
+            }
+        }
+        return total;
+    }
+
+    public static Float obstaclesReadSegment(int offsetX) {
         if (Minecraft.getMinecraft() == null) {
-            return;
+            return null;
         }
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.thePlayer == null) {
-            return;
+            return null;
         }
         if (mc.theWorld == null) {
-            return;
+            return null;
         }
-        BlockPos startPos = mc.thePlayer.getPosition().add(-25+offsetX, -2, -6);
+        BlockPos pStart = mc.thePlayer.getPosition();
+        BlockPos checkStart = new BlockPos(
+                VoxylUtils.round(pStart.getX()+30, 100),
+                VoxylUtils.round(pStart.getY()+30, 100),
+                VoxylUtils.round(pStart.getZ(), 100)
+        );
+        checkStart = checkStart.add(new BlockPos(-94, -98, -11));
+
+        System.out.println(mc.thePlayer.getPosition());
+        System.out.println(checkStart);
+
+        BlockPos startPos = checkStart.add(-25+offsetX, -2, -6);
         BlockPos endPos = startPos.add(10, 10, 10);
         Iterable<BlockPos> positions = BlockPos.getAllInBox(startPos, endPos);
 
@@ -100,6 +126,8 @@ public class VoxylMisc {
             joiner.add(thing);
         }
 
-        System.out.println(DigestUtils.md5Hex(joiner.toString()));
+        String hashed = DigestUtils.md5Hex(joiner.toString());
+
+        return speedScores.get(getSegmentFromHash(hashed));
     }
 }
