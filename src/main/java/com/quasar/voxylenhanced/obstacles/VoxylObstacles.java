@@ -317,7 +317,9 @@ public class VoxylObstacles extends VoxylFeature {
                     }
                 }
             }
-            VoxylUtils.drawText("Speed Score: " + df.format(speedScore), leftAligned, 5+((10+spac)*5));
+            if (VoxylEnhanced.settings.obstaclesDoSpeedScore) {
+                VoxylUtils.drawText("Speed Score: " + df.format(speedScore), leftAligned, 5 + ((10 + spac) * 5));
+            }
         }
     }
 

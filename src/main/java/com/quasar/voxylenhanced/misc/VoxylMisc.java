@@ -62,6 +62,9 @@ public class VoxylMisc {
     }
 
     public static Float obstaclesReadSegment(int offsetX) {
+        if (!VoxylEnhanced.settings.obstaclesDoSpeedScore) {
+            return null;
+        }
         if (Minecraft.getMinecraft() == null) {
             return null;
         }
