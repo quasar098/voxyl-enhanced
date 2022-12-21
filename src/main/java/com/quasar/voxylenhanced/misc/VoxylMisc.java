@@ -1,5 +1,6 @@
 package com.quasar.voxylenhanced.misc;
 
+import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylUtils;
 import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import net.minecraft.block.Block;

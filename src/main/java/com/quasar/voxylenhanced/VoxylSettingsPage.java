@@ -87,6 +87,14 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public int obstaclesSpacing = 3;
 
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Speed score stuff",
+            description = "Enable speed score stuff. Currently WIP",
+            category = "Obstacles"
+    )
+    public boolean obstaclesDoSpeedScore = false;
+
     // autogg
 
     @Property(
