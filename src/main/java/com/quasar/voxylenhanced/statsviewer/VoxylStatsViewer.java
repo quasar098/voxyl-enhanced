@@ -9,9 +9,14 @@ import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
 import com.quasar.voxylenhanced.VoxylUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.Sys;
@@ -45,6 +50,9 @@ public class VoxylStatsViewer extends VoxylFeature {
         if (!currentlyInGame) {
             return;
         }
+        if (!VoxylEnhanced.settings.showTable) {
+            return;
+        }
         int ty = 5;
         boolean lalign = true;
         if (VoxylEnhanced.settings.statsViewerShowFirstLine && (stats.size() != 0)) {
@@ -57,6 +65,25 @@ public class VoxylStatsViewer extends VoxylFeature {
             }
             VoxylUtils.drawText(stat.formatted(), VoxylEnhanced.settings.statsViewerLeftAligned, ty);
             ty += 10 + VoxylEnhanced.settings.statsViewerSpacing;
+        }
+    }
+
+    @SubscribeEvent
+    public void renderOverlay(RenderLivingEvent.Specials.Post<EntityLivingBase> event) {
+        if (!VoxylEnhanced.settings.showBelowName) {
+            return;
+        }
+        String playerName = event.entity.getName();
+        if (!VoxylEnhanced.settings.showOwnBelowName) {
+            if (playerName.equals(Minecraft.getMinecraft().thePlayer.getName())) {
+                return;
+            }
+        }
+        for (VoxylStatsViewerSegment stat : stats) {
+            if (stat.name.equals(playerName)) {
+                VoxylLevelhead.renderTag(event.entity, event.x, event.y+0.3, event.z, stat.stars);
+                break;
+            }
         }
     }
 

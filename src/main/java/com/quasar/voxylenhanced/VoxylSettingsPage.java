@@ -187,6 +187,30 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean statsViewerShowFirstLine = true;
 
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Show table",
+            description = "Show table for stats viewer at all",
+            category = "Stats Viewer"
+    )
+    public boolean showTable = false;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Show levelhead",
+            description = "Show levelhead style text for star below names",
+            category = "Stats viewer"
+    )
+    public boolean showBelowName = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Show own levelhead",
+            description = "Show levelhead for own name too",
+            category = "Stats viewer"
+    )
+    public boolean showOwnBelowName = false;
+
     // hide messages
 
     @Property(
@@ -316,6 +340,22 @@ public class VoxylSettingsPage extends Vigilant {
             category = "Hide Messages"
     )
     public boolean hideMessageDiagonal = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Practice on a bad day",
+            description = "(!) Server doesn't track losses. Feel free to practice on a bad day to warm up.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessagePractice = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Rearrange hotbar",
+            description = "(!) Use /hotbar to re-arrange your hotbar.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageHotbar = true;
 
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());
