@@ -28,6 +28,7 @@ public class VoxylStatsViewer extends VoxylFeature {
 
     public static AsyncHttpClient client = new AsyncHttpClient();
     List<VoxylStatsViewerSegment> stats = new ArrayList<>();
+    public static Map<String, Integer> cachedStars = new HashMap<>();
     boolean currentlyInGame = false;
     boolean waitingForGameStart = false;
     boolean apiIsDown = false;
@@ -79,12 +80,10 @@ public class VoxylStatsViewer extends VoxylFeature {
                 return;
             }
         }
-        for (VoxylStatsViewerSegment stat : stats) {
-            if (stat.name.equals(playerName)) {
-                VoxylLevelhead.renderTag(event.entity, event.x, event.y+0.3, event.z, stat.stars);
-                break;
-            }
+        if (!cachedStars.containsKey(playerName)) {
+            return;
         }
+        VoxylLevelhead.renderTag(event.entity, event.x, event.y+0.3, event.z, cachedStars.get(playerName));
     }
 
     @SubscribeEvent
@@ -150,6 +149,9 @@ public class VoxylStatsViewer extends VoxylFeature {
 
                             JsonPrimitive level = obj.getAsJsonPrimitive("level");
                             JsonPrimitive weightedwins = obj.getAsJsonPrimitive("weightedwins");
+                            if (!cachedStars.containsKey(stats.get(finalIndex).name)) {
+                                cachedStars.put(stats.get(finalIndex).name, level.getAsInt());
+                            }
                             if (level != null) {
                                 stats.get(finalIndex).stars = level.getAsInt();
                             }

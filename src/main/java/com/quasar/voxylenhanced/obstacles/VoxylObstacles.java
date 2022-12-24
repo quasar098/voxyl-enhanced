@@ -170,8 +170,12 @@ public class VoxylObstacles extends VoxylFeature {
                             opponentWins = "0";
                             return;
                         }
-                        opponentWins = obstacles.get("wins").getAsInt() + "";
-                        winsMap.put(opponentName, obstacles.get("wins").getAsInt());
+                        try {
+                            opponentWins = obstacles.get("wins").getAsInt() + "";
+                            winsMap.put(opponentName, obstacles.get("wins").getAsInt());
+                        } catch (NullPointerException e) {
+                            opponentWins = "0";
+                        }
                     }
                     @Override
                     public void onFailure(int i, Map<String, List<String>> map, String s) {
