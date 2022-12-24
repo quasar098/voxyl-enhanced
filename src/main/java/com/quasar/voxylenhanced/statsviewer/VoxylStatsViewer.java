@@ -69,7 +69,7 @@ public class VoxylStatsViewer extends VoxylFeature {
     }
 
     @SubscribeEvent
-    public void renderOverlay(RenderLivingEvent.Specials.Post<EntityLivingBase> event) {
+    public void renderOverlay(RenderLivingEvent.Specials.Post<EntityPlayer> event) {
         if (!VoxylEnhanced.settings.showBelowName) {
             return;
         }
