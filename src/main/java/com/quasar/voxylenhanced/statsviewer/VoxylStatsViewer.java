@@ -80,10 +80,7 @@ public class VoxylStatsViewer extends VoxylFeature {
                 return;
             }
         }
-        if (!cachedStars.containsKey(playerName)) {
-            return;
-        }
-        VoxylLevelhead.renderTag(event.entity, event.x, event.y+0.3, event.z, cachedStars.get(playerName));
+        VoxylLevelhead.renderTag(event.entity, event.x, event.y+0.3, event.z, cachedStars.getOrDefault(playerName, -1));
     }
 
     @SubscribeEvent

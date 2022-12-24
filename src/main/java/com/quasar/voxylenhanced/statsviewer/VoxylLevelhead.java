@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -30,6 +31,9 @@ public class VoxylLevelhead {
 
     @SuppressWarnings("unused")
     public static void renderTag(EntityLivingBase entityPlayer, double x, double y, double z, int star) {
+        if (star == -1) {
+            return;
+        }
         // stole this code from https://github.com/Sk1erLLC/TNTTime/blob/master/src/main/java/club/sk1er/mods/tnttimer/TNTTime.java
         final int fuseTimer = 28;
         double distance = entityPlayer.getDistanceSqToEntity(Minecraft.getMinecraft().thePlayer);
@@ -58,7 +62,9 @@ public class VoxylLevelhead {
         GlStateManager.pushMatrix();
         float offset = 0f;
         if (entityPlayer.getDistanceToEntity(Minecraft.getMinecraft().thePlayer) < 10D) {
-            offset = 0.25f;
+            if (((EntityPlayer) entityPlayer).getWorldScoreboard().getObjectiveInDisplaySlot(2) != null) {
+                offset = 0.25f;
+            }
         }
         GlStateManager.translate((float) x + 0.0F, (float) y + entityPlayer.height + 0.5F + offset, (float) z);
         GL11.glNormal3f(0.0F, 1.0F, 0.0F);
