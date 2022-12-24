@@ -9,9 +9,6 @@ import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
 import com.quasar.voxylenhanced.VoxylUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -19,7 +16,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.Sys;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -51,7 +47,7 @@ public class VoxylStatsViewer extends VoxylFeature {
         if (!currentlyInGame) {
             return;
         }
-        if (!VoxylEnhanced.settings.showTable) {
+        if (!VoxylEnhanced.settings.statsViewerShowTable) {
             return;
         }
         int ty = 5;
@@ -71,11 +67,11 @@ public class VoxylStatsViewer extends VoxylFeature {
 
     @SubscribeEvent
     public void renderOverlay(RenderLivingEvent.Specials.Post<EntityPlayer> event) {
-        if (!VoxylEnhanced.settings.showBelowName) {
+        if (!VoxylEnhanced.settings.statsViewerShowBelowName) {
             return;
         }
         String playerName = event.entity.getName();
-        if (!VoxylEnhanced.settings.showOwnBelowName) {
+        if (!VoxylEnhanced.settings.statsViewerShowOwnBelowName) {
             if (playerName.equals(Minecraft.getMinecraft().thePlayer.getName())) {
                 return;
             }
@@ -104,11 +100,6 @@ public class VoxylStatsViewer extends VoxylFeature {
             client.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
             client.setConnectionTimeout(3000);
             for (String name : playerNames.split("\\s")) {
-                if (!VoxylEnhanced.settings.statsViewerShowOwnName) {
-                    if (name.equals(Minecraft.getMinecraft().thePlayer.getName())) {
-                        continue;
-                    }
-                }
                 VoxylStatsViewerSegment stat = new VoxylStatsViewerSegment(name);
                 stats.add(stat);
             }

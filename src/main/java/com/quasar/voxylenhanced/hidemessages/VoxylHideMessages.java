@@ -30,6 +30,7 @@ public class VoxylHideMessages extends VoxylFeature {
     static Pattern pPractice = Pattern.compile("^\\(!\\) Server doesn't track losses\\. Feel free to practice on a bad day to warm up\\.$");
     static Pattern pDiagonal = Pattern.compile("\\(!\\) It is recommended to practice diagonal bridging to complete the last segment of the course as fast as possible\\.$");
     static Pattern pHotbar = Pattern.compile("^\\(!\\) Use /hotbar to re-arrange your hotbar\\.$");
+    static Pattern pSprintHits = Pattern.compile("^\\(!\\) Use /showfailed to see when you fail a sprint hit!$");
 
     // the settings for these are in VoxylSettingsPage
 
@@ -130,6 +131,11 @@ public class VoxylHideMessages extends VoxylFeature {
         }
         if (VoxylEnhanced.settings.hideMessageHotbar) {
             if (pHotbar.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageSprintHits){
+            if (pSprintHits.matcher(m).find()) {
                 event.setCanceled(true);
             }
         }

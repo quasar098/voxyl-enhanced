@@ -4,7 +4,9 @@ import com.quasar.voxylenhanced.misc.VoxylMisc;
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.*;
 import org.jetbrains.annotations.NotNull;
+import scala.sys.Prop;
 
+import java.awt.*;
 import java.io.File;
 import java.util.Comparator;
 
@@ -126,22 +128,6 @@ public class VoxylSettingsPage extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Toggled",
-            description = "Whether stats viewer is toggled on or not",
-            category = "Stats Viewer"
-    )
-    public boolean statsViewerToggled = true;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "Left Aligned",
-            description = "Should the stats viewer be left or right aligned",
-            category = "Stats Viewer"
-    )
-    public boolean statsViewerLeftAligned = true;
-
-    @Property(
-            type = PropertyType.SWITCH,
             name = "Cache UUIDS",
             description = "I recommend keeping this on",
             category = "Stats Viewer"
@@ -150,16 +136,24 @@ public class VoxylSettingsPage extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
-            name = "Show Own Name",
-            description = "Should the list include your name",
+            name = "Toggled",
+            description = "Whether stats viewer table is toggled on or not",
             category = "Stats Viewer"
     )
-    public boolean statsViewerShowOwnName = false;
+    public boolean statsViewerToggled = true;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Left Aligned",
+            description = "Should the stats viewer table be left or right aligned",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerLeftAligned = true;
 
     @Property(
             type = PropertyType.SELECTOR,
             name = "Sorting Behavior",
-            description = "How should the list be sorted?",
+            description = "How should the stats viewer table be sorted",
             options = {
                     "Alphabetical",
                     "Stars",
@@ -172,7 +166,7 @@ public class VoxylSettingsPage extends Vigilant {
     @Property(
             type = PropertyType.SLIDER,
             name = "Spacing",
-            description = "Spacing between list entries",
+            description = "Spacing between stats viewer table entries",
             min = 1,
             max = 10,
             category = "Stats Viewer"
@@ -182,34 +176,60 @@ public class VoxylSettingsPage extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "Show First Line",
-            description = "Show the \"Name | Stars | Weighted Wins\" message",
+            description = "Show the \"Name | Stars | Weighted Wins\" message in stats viewer table",
             category = "Stats Viewer"
     )
     public boolean statsViewerShowFirstLine = true;
 
     @Property(
             type = PropertyType.CHECKBOX,
-            name = "Show table",
-            description = "Show table for stats viewer at all",
+            name = "Show Table",
+            description = "Toggle stats viewer table",
             category = "Stats Viewer"
     )
-    public boolean showTable = false;
+    public boolean statsViewerShowTable = false;
 
     @Property(
             type = PropertyType.CHECKBOX,
-            name = "Show levelhead",
-            description = "Show levelhead style text for star below names",
-            category = "Stats viewer"
+            name = "Show Levelhead",
+            description = "Show levelhead below an opponent's name",
+            category = "Stats Viewer"
     )
-    public boolean showBelowName = true;
+    public boolean statsViewerShowBelowName = true;
 
     @Property(
             type = PropertyType.CHECKBOX,
-            name = "Show own levelhead",
-            description = "Show levelhead for own name too",
-            category = "Stats viewer"
+            name = "Show Own Levelhead",
+            description = "Show levelhead for your own name too",
+            category = "Stats Viewer"
     )
-    public boolean showOwnBelowName = false;
+    public boolean statsViewerShowOwnBelowName = false;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Levelhead Background Opacity",
+            description = "The opacity of the background of the levelhead",
+            category = "Stats Viewer",
+            max = 100
+    )
+    public int statsViewerLevelheadOpacity = 25;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Levelhead Prestige Color",
+            description = "Make levelhead text color based on prestige instead of just white",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerLevelheadPrestige = true;
+
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Levelhead No Prestige Color",
+            description = "The brightness value of text of a player with less than 100 stars (less than iron prestige)",
+            category = "Stats Viewer",
+            max = 100
+    )
+    public int statsViewerLevelheadColorOfNoPrestigePlayer = 67;
 
     // hide messages
 
@@ -356,6 +376,14 @@ public class VoxylSettingsPage extends Vigilant {
             category = "Hide Messages"
     )
     public boolean hideMessageHotbar = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Sprint hits",
+            description = "(!) Use /showfailed to see when you fail a sprint hit!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageSprintHits = true;
 
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());

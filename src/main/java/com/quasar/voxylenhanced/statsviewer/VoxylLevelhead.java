@@ -1,5 +1,6 @@
 package com.quasar.voxylenhanced.statsviewer;
 
+import com.quasar.voxylenhanced.VoxylEnhanced;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -87,16 +88,26 @@ public class VoxylLevelhead {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         int stringWidth = fontrenderer.getStringWidth(starText) >> 1;
-        Color color = getColorMap().getOrDefault((star/100)%10, getColorMap().get(0));
+        Color color;
+        if (VoxylEnhanced.settings.statsViewerLevelheadPrestige) {
+            color = getColorMap().getOrDefault((star / 100) % 10, getColorMap().get(0));
+            if (star < 100) {
+                float n = (float) VoxylEnhanced.settings.statsViewerLevelheadColorOfNoPrestigePlayer/100;
+                color = new Color(n, n, n);
+            }
+        } else {
+            color = Color.WHITE;
+        }
         // https://hypixel.net/attachments/1602743904489-png.2046478/
         GlStateManager.enableDepth();
         GlStateManager.depthMask(true);
         GlStateManager.disableTexture2D();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(-stringWidth - 1, -1, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-        worldrenderer.pos(-stringWidth - 1, 8, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-        worldrenderer.pos(stringWidth + 1, 8, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-        worldrenderer.pos(stringWidth + 1, -1, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        float opacity = (float) VoxylEnhanced.settings.statsViewerLevelheadOpacity/100;
+        worldrenderer.pos(-stringWidth - 1, -1, 0.0D).color(0f, 0f, 0f, opacity).endVertex();
+        worldrenderer.pos(-stringWidth - 1, 8, 0.0D).color(0f, 0f, 0f, opacity).endVertex();
+        worldrenderer.pos(stringWidth + 1, 8, 0.0D).color(0f, 0f, 0f, opacity).endVertex();
+        worldrenderer.pos(stringWidth + 1, -1, 0.0D).color(0f, 0f, 0f, opacity).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
         fontrenderer.drawString(starText, -fontrenderer.getStringWidth(starText) >> 1, 0, color.getRGB());
