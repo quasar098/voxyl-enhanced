@@ -31,6 +31,9 @@ public class VoxylHideMessages extends VoxylFeature {
     static Pattern pDiagonal = Pattern.compile("\\(!\\) It is recommended to practice diagonal bridging to complete the last segment of the course as fast as possible\\.$");
     static Pattern pHotbar = Pattern.compile("^\\(!\\) Use /hotbar to re-arrange your hotbar\\.$");
     static Pattern pSprintHits = Pattern.compile("^\\(!\\) Use /showfailed to see when you fail a sprint hit!$");
+    static Pattern pAutomaticRearrange = Pattern.compile("^\\(!\\) Re-arrange your hotbar and it will automatically save\\.$");
+    static Pattern pAvoidSame = Pattern.compile("^\\(!\\) Can avoid same players in a requeued game with 'avoid same players' option in /chatpref\\.$");
+    static Pattern pDisconnected = Pattern.compile("^\\(!\\) If you are disconnected from your game, use /rejoin to reconnect\\.$");
 
     // the settings for these are in VoxylSettingsPage
 
@@ -84,7 +87,7 @@ public class VoxylHideMessages extends VoxylFeature {
                 event.setCanceled(true);
             }
         }
-        if (VoxylEnhanced.settings.hideMessageRank) {
+        if (VoxylEnhanced.settings.hideMessageRank) {  // i feel guilty
             if (pRank.matcher(m).find()) {
                 event.setCanceled(true);
             }
@@ -134,8 +137,28 @@ public class VoxylHideMessages extends VoxylFeature {
                 event.setCanceled(true);
             }
         }
-        if (VoxylEnhanced.settings.hideMessageSprintHits){
+        if (VoxylEnhanced.settings.hideMessageSprintHits) {
             if (pSprintHits.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageAutomaticRearrange) {
+            if (pAutomaticRearrange.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageAvoidSame) {
+            if (pAvoidSame.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageDisconnect) {
+            if (pAvoidSame.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageCustomRegex.length() > 0) {
+            if (Pattern.compile(VoxylEnhanced.settings.hideMessageCustomRegex).matcher(m).find()) {
                 event.setCanceled(true);
             }
         }

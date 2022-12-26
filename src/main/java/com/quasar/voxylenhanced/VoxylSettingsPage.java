@@ -385,6 +385,38 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean hideMessageSprintHits = true;
 
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Automatic Rearrange",
+            description = "(!) Re-arrange your hotbar and it will automatically save.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageAutomaticRearrange = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Avoid same players",
+            description = "(!) Can avoid same players in a requeued game with 'avoid same players' option in /chatpref.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageAvoidSame = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Disconnected rejoin",
+            description = "(!) If you are disconnected from your game, use /rejoin to reconnect.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageDisconnect = true;
+
+    @Property(
+            type = PropertyType.TEXT,
+            name = "Custom regex",
+            description = "Only put stuff here if you know what you're doing",
+            category = "Hide Messages"
+    )
+    public String hideMessageCustomRegex = "";
+
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());
 
