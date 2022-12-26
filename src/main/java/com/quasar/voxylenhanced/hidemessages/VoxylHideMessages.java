@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class VoxylHideMessages extends VoxylFeature {
 
@@ -158,8 +159,12 @@ public class VoxylHideMessages extends VoxylFeature {
             }
         }
         if (VoxylEnhanced.settings.hideMessageCustomRegex.length() > 0) {
-            if (Pattern.compile(VoxylEnhanced.settings.hideMessageCustomRegex).matcher(m).find()) {
-                event.setCanceled(true);
+            try {
+                if (Pattern.compile(VoxylEnhanced.settings.hideMessageCustomRegex).matcher(m).find()) {
+                    event.setCanceled(true);
+                }
+            } catch (PatternSyntaxException ignored) {
+                System.out.println("this custom regex hide messages pattern is invalid");
             }
         }
     }
