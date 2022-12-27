@@ -10,6 +10,9 @@
 - obstacles keybind to enter new singleplayer
 - list the stats of players in your game
 - keybind to `/hub` at any given moment
+- hide annoying and repetitive messages from the server
+- automatically run /lactate every X seconds
+- levelhead for the players in your game
 
 ### other things:
 
