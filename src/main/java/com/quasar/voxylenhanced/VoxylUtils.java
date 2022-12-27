@@ -22,6 +22,7 @@ import java.util.UUID;
 public class VoxylUtils {
 
     public static AsyncHttpClient utilsAsyncClient = new AsyncHttpClient();
+    public static boolean apiWarningGiven = false;
 
     public abstract static class CallBack<ZArg, TArg> {
         public abstract void call(ZArg val, TArg val2);
@@ -60,6 +61,12 @@ public class VoxylUtils {
             @Override
             public void onFailure(int i, Map<String, List<String>> map, String s) {
                 if (i == 400) {
+                    if (s.contains("Must provide an API key!")) {
+                        if (!apiWarningGiven) {
+                            informPlayer("You need to put an API key into Voxyl Enhanced mod! Run /ve for more info");
+                            apiWarningGiven = true;
+                        }
+                    }
                     return;
                 }
                 System.out.println("Failure at getStarsFromUUID with code: " + i);

@@ -46,7 +46,7 @@ public class VoxylSettingsPage extends Vigilant {
     @Property(
             type = PropertyType.TEXT,
             name = "API Key",
-            description = "Can also be set using /ve <key>",
+            description = "Run /api new, then /api get, copy it, and put it here for the mod to work. Note that this is YOUR personal api key, no one else is supposed to see this",
             category = "General",
             placeholder = "Api key goes here",
             protectedText = true
