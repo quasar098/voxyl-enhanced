@@ -64,7 +64,12 @@ public class VoxylLevelhead {
         float offset = 0f;
         if (entityPlayer.getDistanceToEntity(Minecraft.getMinecraft().thePlayer) < 10D) {
             if (((EntityPlayer) entityPlayer).getWorldScoreboard().getObjectiveInDisplaySlot(2) != null) {
-                offset = 0.25f;
+                if (entityPlayer.getName().equals(Minecraft.getMinecraft().thePlayer.getName())) {
+                    if (!VoxylEnhanced.settings.statsViewerSelfIndent) {
+                        offset = -0.25f;
+                    }
+                }
+                offset += 0.25f;
             }
         }
         GlStateManager.translate((float) x + 0.0F, (float) y + entityPlayer.height + 0.5F + offset, (float) z);

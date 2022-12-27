@@ -4,26 +4,27 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mb3364.http.AsyncHttpClient;
 import com.mb3364.http.StringHttpResponseHandler;
-import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.scoreboard.Score;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 public class VoxylUtils {
 
     public static AsyncHttpClient utilsAsyncClient = new AsyncHttpClient();
 
-    public abstract static class CallBack<TArg> {
-        public abstract void call(TArg val);
+    public abstract static class CallBack<ZArg, TArg> {
+        public abstract void call(ZArg val, TArg val2);
     }
 
     // send chat message
@@ -40,9 +41,9 @@ public class VoxylUtils {
         }
     }
 
-    public static void getStarsFromUUID(UUID id, CallBack<Integer> callback) {
+    public static void getStarsFromUUID(String name, UUID id, CallBack<String, Integer> callback) {
         System.setProperty("http.agent", "Chrome");
-        String url = "http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + VoxylEnhanced.settings.apiKey;
+        String url = "http://api.voxyl.net/player/stats/overall/" + id.toString() + "/?api=" + VoxylEnhanced.settings.apiKey;
         utilsAsyncClient.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
         utilsAsyncClient.setConnectionTimeout(3000);
         utilsAsyncClient.get(url, new StringHttpResponseHandler() {
@@ -50,20 +51,10 @@ public class VoxylUtils {
             public void onSuccess(int i, Map<String, List<String>> map, String content) {
                 JsonParser parser = new JsonParser();
                 JsonObject obj = (JsonObject) parser.parse(content);
-                JsonObject stats = (JsonObject) obj.get("stats");
-                if (stats == null) {
-                    System.out.println("Stats are null at getStarsFromUUID");
-                    return;
-                }
-                JsonObject obstacles = (JsonObject) stats.get("obstacleSingle");
-                if (obstacles == null) {
-                    callback.call(0);
-                    return;
-                }
                 try {
-                    callback.call(obstacles.get("wins").getAsInt());
+                    callback.call(name, obj.get("level").getAsInt());
                 } catch (NullPointerException e) {
-                    callback.call(0);
+                    callback.call(name, 0);
                 }
             }
             @Override
@@ -80,6 +71,7 @@ public class VoxylUtils {
         });
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isInVoxylNetwork() {
         if (Minecraft.getMinecraft() == null) {
             return false;
@@ -92,6 +84,15 @@ public class VoxylUtils {
         }
         String serverIP = Minecraft.getMinecraft().getCurrentServerData().serverIP;
         return serverIP.equals("bedwarspractice.club") || serverIP.equals("voxyl.net");
+    }
+
+    public static boolean isInBWPLobby() {
+        if (!isInVoxylNetwork()) {
+            return false;
+        }
+        Scoreboard sb = Minecraft.getMinecraft().theWorld.getScoreboard();
+        List<Score> scores = new ArrayList<>(sb.getScores());
+        return scores.size() == 10;  // bad way but whatever
     }
 
     public static int round(int number,int multiple) {

@@ -239,6 +239,14 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean statsViewerScanLobby = true;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Levelhead Move Up For Self Levelhead",
+            description = "Move up your levelhead to account for the real levelhead mod so you can have two",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerSelfIndent = true;
+
     // hide messages
 
     @Property(

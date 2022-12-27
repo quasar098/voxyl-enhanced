@@ -79,7 +79,17 @@ public class VoxylStatsViewer extends VoxylFeature {
 
         // fetch lobby stuff idk
         if (VoxylEnhanced.settings.statsViewerScanLobby) {
-
+            if (VoxylUtils.isInBWPLobby()) {
+                if (!cachedStars.containsKey(playerName)) {
+                    cachedStars.put(playerName, -1);
+                    VoxylUtils.getStarsFromUUID(playerName, playerUUID, new VoxylUtils.CallBack<String, Integer>() {
+                        @Override
+                        public void call(String val, Integer val2) {
+                            cachedStars.put(val, val2);
+                        }
+                    });
+                }
+            }
         }
 
         // remove self name if needed
