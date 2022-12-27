@@ -1,23 +1,25 @@
 package com.quasar.voxylenhanced.misc;
 
 import com.quasar.voxylenhanced.VoxylEnhanced;
+import com.quasar.voxylenhanced.VoxylFeature;
 import com.quasar.voxylenhanced.VoxylUtils;
-import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.StringJoiner;
 
-import static com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments.*;
+import static com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments.getSegmentFromHash;
+import static com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments.speedScores;
 
-public class VoxylMisc {
+public class VoxylMisc extends VoxylFeature {
     public static void goToHub() {
         if (Minecraft.getMinecraft() == null) {
             return;
@@ -133,5 +135,25 @@ public class VoxylMisc {
         String hashed = DigestUtils.md5Hex(joiner.toString());
 
         return speedScores.get(getSegmentFromHash(hashed));
+    }
+
+    public Long lastLactateTime = 0L;
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (!VoxylUtils.isInBWPLobby()) {
+            return;
+        }
+        if (VoxylEnhanced.settings.autoLactateInterval == 0) {
+            return;
+        }
+        if (lastLactateTime == 0 || lastLactateTime < System.currentTimeMillis()-(VoxylEnhanced.settings.autoLactateInterval * 1000L)) {
+            lastLactateTime = System.currentTimeMillis();
+            Minecraft.getMinecraft().thePlayer.sendChatMessage("/lactate");
+        }
+    }
+
+    public void reset() {
+
     }
 }

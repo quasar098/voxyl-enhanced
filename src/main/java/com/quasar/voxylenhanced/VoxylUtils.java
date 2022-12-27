@@ -43,7 +43,7 @@ public class VoxylUtils {
 
     public static void getStarsFromUUID(String name, UUID id, CallBack<String, Integer> callback) {
         System.setProperty("http.agent", "Chrome");
-        String url = "http://api.voxyl.net/player/stats/overall/" + id.toString() + "/?api=" + VoxylEnhanced.settings.apiKey;
+        String url = "http://api.voxyl.net/player/stats/overall/" + id.toString() + "?api=" + VoxylEnhanced.settings.apiKey;
         utilsAsyncClient.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
         utilsAsyncClient.setConnectionTimeout(3000);
         utilsAsyncClient.get(url, new StringHttpResponseHandler() {
@@ -59,6 +59,9 @@ public class VoxylUtils {
             }
             @Override
             public void onFailure(int i, Map<String, List<String>> map, String s) {
+                if (i == 400) {
+                    return;
+                }
                 System.out.println("Failure at getStarsFromUUID with code: " + i);
                 if (i == 521) {
                     System.out.println("Api is down!");
@@ -88,6 +91,12 @@ public class VoxylUtils {
 
     public static boolean isInBWPLobby() {
         if (!isInVoxylNetwork()) {
+            return false;
+        }
+        if (Minecraft.getMinecraft().theWorld == null) {
+            return false;
+        }
+        if (Minecraft.getMinecraft().theWorld.getScoreboard() == null) {
             return false;
         }
         Scoreboard sb = Minecraft.getMinecraft().theWorld.getScoreboard();

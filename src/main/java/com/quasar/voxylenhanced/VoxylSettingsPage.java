@@ -53,6 +53,15 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public String apiKey = "";
 
+    @Property(
+            type = PropertyType.SLIDER,
+            name = "Auto lactate",
+            description = "You need perms for this! Automatically does /lactate every X seconds (0 = off)",
+            category = "General",
+            max = 20
+    )
+    public int autoLactateInterval = 0;
+
     // obstacles
 
     @Property(

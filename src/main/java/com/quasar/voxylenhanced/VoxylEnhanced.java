@@ -3,6 +3,7 @@ package com.quasar.voxylenhanced;
 import com.google.common.collect.Lists;
 import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
 import com.quasar.voxylenhanced.hidemessages.VoxylHideMessages;
+import com.quasar.voxylenhanced.misc.VoxylMisc;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
 import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import com.quasar.voxylenhanced.statsviewer.VoxylStatsViewer;
@@ -34,7 +35,8 @@ public class VoxylEnhanced
             new VoxylObstacles(),
             new VoxylAutoGG(),
             new VoxylStatsViewer(),
-            new VoxylHideMessages()
+            new VoxylHideMessages(),
+            new VoxylMisc()
     );
     
     @EventHandler
