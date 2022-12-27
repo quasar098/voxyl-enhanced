@@ -35,7 +35,7 @@ public class VoxylStatsViewer extends VoxylFeature {
         if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().getCurrentServerData() == null) {
             return;
         }
-        if (!Minecraft.getMinecraft().getCurrentServerData().serverIP.equals("bedwarspractice.club")) {
+        if (!VoxylUtils.isInVoxylNetwork()) {
             return;
         }
 
@@ -70,12 +70,26 @@ public class VoxylStatsViewer extends VoxylFeature {
         if (!VoxylEnhanced.settings.statsViewerShowBelowName) {
             return;
         }
+        if (!VoxylUtils.isInVoxylNetwork()) {
+            return;
+        }
+
         String playerName = event.entity.getName();
+        UUID playerUUID = event.entity.getUniqueID();
+
+        // fetch lobby stuff idk
+        if (VoxylEnhanced.settings.statsViewerScanLobby) {
+
+        }
+
+        // remove self name if needed
         if (!VoxylEnhanced.settings.statsViewerShowOwnBelowName) {
             if (playerName.equals(Minecraft.getMinecraft().thePlayer.getName())) {
                 return;
             }
         }
+
+        // render the tag
         VoxylLevelhead.renderTag(event.entity, event.x, event.y+0.3, event.z, cachedStars.getOrDefault(playerName, -1));
     }
 
@@ -84,7 +98,7 @@ public class VoxylStatsViewer extends VoxylFeature {
         if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().getCurrentServerData() == null) {
             return;
         }
-        if (!Minecraft.getMinecraft().getCurrentServerData().serverIP.equals("bedwarspractice.club")) {
+        if (!VoxylUtils.isInVoxylNetwork()) {
             return;
         }
         if (apiIsDown) {

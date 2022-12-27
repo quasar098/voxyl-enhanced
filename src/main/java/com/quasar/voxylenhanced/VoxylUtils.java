@@ -1,5 +1,9 @@
 package com.quasar.voxylenhanced;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mb3364.http.AsyncHttpClient;
+import com.mb3364.http.StringHttpResponseHandler;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -9,9 +13,18 @@ import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 public class VoxylUtils {
+
+    public static AsyncHttpClient utilsAsyncClient = new AsyncHttpClient();
+
+    public abstract static class CallBack<TArg> {
+        public abstract void call(TArg val);
+    }
 
     // send chat message
 
@@ -25,6 +38,60 @@ public class VoxylUtils {
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(String.join("\n", strings))
                     .setChatStyle(new ChatStyle().setColor(color)));
         }
+    }
+
+    public static void getStarsFromUUID(UUID id, CallBack<Integer> callback) {
+        System.setProperty("http.agent", "Chrome");
+        String url = "http://api.voxyl.net/player/stats/game/" + id.toString() + "/?api=" + VoxylEnhanced.settings.apiKey;
+        utilsAsyncClient.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+        utilsAsyncClient.setConnectionTimeout(3000);
+        utilsAsyncClient.get(url, new StringHttpResponseHandler() {
+            @Override
+            public void onSuccess(int i, Map<String, List<String>> map, String content) {
+                JsonParser parser = new JsonParser();
+                JsonObject obj = (JsonObject) parser.parse(content);
+                JsonObject stats = (JsonObject) obj.get("stats");
+                if (stats == null) {
+                    System.out.println("Stats are null at getStarsFromUUID");
+                    return;
+                }
+                JsonObject obstacles = (JsonObject) stats.get("obstacleSingle");
+                if (obstacles == null) {
+                    callback.call(0);
+                    return;
+                }
+                try {
+                    callback.call(obstacles.get("wins").getAsInt());
+                } catch (NullPointerException e) {
+                    callback.call(0);
+                }
+            }
+            @Override
+            public void onFailure(int i, Map<String, List<String>> map, String s) {
+                System.out.println("Failure at getStarsFromUUID with code: " + i);
+                if (i == 521) {
+                    System.out.println("Api is down!");
+                }
+            }
+            @Override
+            public void onFailure(Throwable throwable) {
+                System.out.println("Failure throwable at getStarsFromUUID");
+            }
+        });
+    }
+
+    public static boolean isInVoxylNetwork() {
+        if (Minecraft.getMinecraft() == null) {
+            return false;
+        }
+        if (Minecraft.getMinecraft().getCurrentServerData() == null) {
+            return false;
+        }
+        if (Minecraft.getMinecraft().getCurrentServerData().serverIP == null) {
+            return false;
+        }
+        String serverIP = Minecraft.getMinecraft().getCurrentServerData().serverIP;
+        return serverIP.equals("bedwarspractice.club") || serverIP.equals("voxyl.net");
     }
 
     public static int round(int number,int multiple) {

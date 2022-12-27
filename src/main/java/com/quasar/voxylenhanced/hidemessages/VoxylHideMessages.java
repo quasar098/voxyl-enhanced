@@ -2,6 +2,7 @@ package com.quasar.voxylenhanced.hidemessages;
 
 import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
+import com.quasar.voxylenhanced.VoxylUtils;
 import com.quasar.voxylenhanced.statsviewer.VoxylLevelhead;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -43,7 +44,7 @@ public class VoxylHideMessages extends VoxylFeature {
         if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().getCurrentServerData() == null) {
             return;
         }
-        if (!Minecraft.getMinecraft().getCurrentServerData().serverIP.equals("bedwarspractice.club")) {
+        if (!VoxylUtils.isInVoxylNetwork()) {
             return;
         }
         String m = event.message.getUnformattedText();

@@ -42,7 +42,7 @@ public class VoxylAutoGG extends VoxylFeature {
         if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().getCurrentServerData() == null) {
             return;
         }
-        if (!Minecraft.getMinecraft().getCurrentServerData().serverIP.equals("bedwarspractice.club")) {
+        if (!VoxylUtils.isInVoxylNetwork()) {
             return;
         }
 

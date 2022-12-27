@@ -231,6 +231,14 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public int statsViewerLevelheadColorOfNoPrestigePlayer = 67;
 
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Levelhead Scan Lobby",
+            description = "Scan the lobby to grab stats (only works on fast internet)",
+            category = "Stats Viewer"
+    )
+    public boolean statsViewerScanLobby = true;
+
     // hide messages
 
     @Property(
