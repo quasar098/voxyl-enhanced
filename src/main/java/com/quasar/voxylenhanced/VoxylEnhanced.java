@@ -7,6 +7,8 @@ import com.quasar.voxylenhanced.misc.VoxylMisc;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
 import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import com.quasar.voxylenhanced.statsviewer.VoxylStatsViewer;
+import com.quasar.voxylenhanced.sumo.VoxylBlockSumo;
+import gg.essential.vigilance.gui.VigilancePalette;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -25,7 +27,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.5.2";
+    public static final String VERSION = "0.5.3";
 
     public static boolean willOpenSettings = false;
 
@@ -36,7 +38,8 @@ public class VoxylEnhanced
             new VoxylAutoGG(),
             new VoxylStatsViewer(),
             new VoxylHideMessages(),
-            new VoxylMisc()
+            new VoxylMisc(),
+            new VoxylBlockSumo()
     );
     
     @EventHandler

@@ -152,16 +152,20 @@ public class VoxylUtils {
     public static FontRenderer fr;
 
     public static void drawText(String str, boolean leftAlignment, int textY) {
-        drawText(str, leftAlignment, 0xFFFFFF, textY);
+        drawText(str, leftAlignment, 255, textY);
     }
 
-    public static void drawText(String str, boolean leftAlignment, int col, int textY) {
+    public static void drawText(String str, boolean leftAlignemnt, int alpha, int textY) {
+        drawText(str, leftAlignemnt, alpha, 0xFFFFFF, textY);
+    }
+
+    public static void drawText(String str, boolean leftAlignment, int alpha, int col, int textY) {
         updateFontRenderer();
         ScaledResolution var5 = new ScaledResolution(Minecraft.getMinecraft());
         int width = var5.getScaledWidth();
         int tWidth = fr.getStringWidth(str);
         int tX = leftAlignment ? 5 : width - (tWidth + 5);
-        fr.drawString(str, tX, textY, col, true);
+        fr.drawString(str, tX, textY, col | (alpha << 24), true);
     }
 
     public static void updateFontRenderer() {

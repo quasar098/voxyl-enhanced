@@ -1,8 +1,10 @@
 package com.quasar.voxylenhanced;
 
 import com.quasar.voxylenhanced.misc.VoxylMisc;
+import gg.essential.vigilance.VigilanceConfig;
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.*;
+import gg.essential.vigilance.gui.VigilancePalette;
 import org.jetbrains.annotations.NotNull;
 import scala.sys.Prop;
 
@@ -442,6 +444,16 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public String hideMessageCustomRegex = "";
 
+    // block sumo
+
+    @Property(
+            type= PropertyType.SWITCH,
+            name = "Block Sumo features enabled",
+            description = "Self explanatory",
+            category = "Block Sumo"
+    )
+    public boolean blockSumoEnabled = false;
+
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());
 
@@ -452,5 +464,6 @@ public class VoxylSettingsPage extends Vigilant {
         setCategoryDescription("Obstacles", "The obstacles gamemode");
         setCategoryDescription("Stats Viewer", "List the stats of players in your game");
         setCategoryDescription("Hide Messages", "Hide repetitive messages sent by the server");
+        setCategoryDescription("Block Sumo", "The block sumo gamemode");
     }
 }

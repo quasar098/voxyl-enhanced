@@ -155,7 +155,7 @@ public class VoxylHideMessages extends VoxylFeature {
             }
         }
         if (VoxylEnhanced.settings.hideMessageDisconnect) {
-            if (pAvoidSame.matcher(m).find()) {
+            if (pDisconnected.matcher(m).find()) {
                 event.setCanceled(true);
             }
         }
