@@ -1,5 +1,6 @@
 # voxyl enhanced
 
+## **note: you need patcher mod for this!!!**
 
 ### it can do this:
 - auto gg
@@ -22,9 +23,8 @@ i used [vigilance](https://github.com/EssentialGG/Vigilance) to make the nice ui
 
 ### allowed on voxyl network?
 
-maybe
+yes
 
 ### todo:
 
 - moveable elements draggable anywhere
-- levelhead for stats viewer
