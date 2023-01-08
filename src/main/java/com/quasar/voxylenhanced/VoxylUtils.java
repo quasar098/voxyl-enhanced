@@ -2,6 +2,7 @@ package com.quasar.voxylenhanced;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.mb3364.http.AsyncHttpClient;
 import com.mb3364.http.StringHttpResponseHandler;
 import net.minecraft.client.Minecraft;
@@ -24,6 +25,42 @@ public class VoxylUtils {
     public static AsyncHttpClient utilsAsyncClient = new AsyncHttpClient();
     public static boolean apiWarningGiven = false;
 
+    public static void getLatestVersion(CallBack<Boolean, String> cb) {
+        try {
+            System.setProperty("http.agent", "Chrome");
+            utilsAsyncClient.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+            utilsAsyncClient.setConnectionTimeout(3000);
+            String url = "https://api.github.com/repos/quasar098/voxyl-enhanced/releases/latest";
+            utilsAsyncClient.get(url, new StringHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Map<String, List<String>> headers, String content) {
+                    JsonParser parser = new JsonParser();
+                    JsonObject obj = (JsonObject) parser.parse(content);
+                    JsonPrimitive tname = obj.getAsJsonPrimitive("tag_name");
+                    if (tname == null) {
+                        cb.call(false, "N/A");
+                        return;
+                    }
+                    boolean outdated =
+                            getVersionNumberFromString(tname.getAsString()) > VoxylEnhanced.settings.latestVersionNumber;
+                    cb.call(outdated, tname.getAsString());
+                }
+
+                @Override
+                public void onFailure(int statusCode, Map<String, List<String>> headers, String content) {
+                    System.out.println("Failure API request at getLatestVersion with code: " + statusCode);
+                }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    System.out.println("Failure API request at getLatestVersion");
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public abstract static class CallBack<ZArg, TArg> {
         public abstract void call(ZArg val, TArg val2);
     }
@@ -42,9 +79,42 @@ public class VoxylUtils {
         }
     }
 
+    public static int getVersionNumberFromString(String idText) {
+        try {
+            String[] things = idText.split("\\.");
+            int total = 0;
+            total += Integer.parseInt(things[0]) * 1000000;
+            total += Integer.parseInt(things[1]) * 1000;
+            total += Integer.parseInt(things[1]);
+            return total;
+        } catch (IndexOutOfBoundsException e) {
+            return -1;
+        }
+    }
+
+    public static String getScoreboardSidebarName() {
+        if (Minecraft.getMinecraft() == null) {
+            return "";
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.thePlayer == null) {
+            return "";
+        }
+        if (mc.thePlayer.getWorldScoreboard() == null) {
+            return "";
+        }
+        if (mc.thePlayer.getWorldScoreboard().getObjectiveInDisplaySlot(1) == null) {
+            return "";
+        }
+        if (mc.thePlayer.getWorldScoreboard().getObjectiveInDisplaySlot(1).getDisplayName() == null) {
+            return "";
+        }
+        return Minecraft.getMinecraft().thePlayer.getWorldScoreboard().getObjectiveInDisplaySlot(1).getDisplayName();
+    }
+
     public static void getStarsFromUUID(String name, UUID id, CallBack<String, Integer> callback) {
-        System.setProperty("http.agent", "Chrome");
         String url = "http://api.voxyl.net/player/stats/overall/" + id.toString() + "?api=" + VoxylEnhanced.settings.apiKey;
+        System.setProperty("http.agent", "Chrome");
         utilsAsyncClient.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
         utilsAsyncClient.setConnectionTimeout(3000);
         utilsAsyncClient.get(url, new StringHttpResponseHandler() {
@@ -81,7 +151,6 @@ public class VoxylUtils {
         });
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isInVoxylNetwork() {
         if (Minecraft.getMinecraft() == null) {
             return false;
@@ -132,7 +201,8 @@ public class VoxylUtils {
     public static UUID getUUIDfromStringWithoutDashes(String withoutDashes) {
         return java.util.UUID.fromString(
             withoutDashes.replaceFirst(
-                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
+                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)",
+                    "$1-$2-$3-$4-$5"
             )
         );
     }

@@ -1,15 +1,17 @@
 package com.quasar.voxylenhanced;
 
 import com.google.common.collect.Lists;
+import com.jagrosh.discordipc.exceptions.NoDiscordClientException;
 import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
 import com.quasar.voxylenhanced.hidemessages.VoxylHideMessages;
+import com.quasar.voxylenhanced.misc.VoxylDiscordRichPresence;
 import com.quasar.voxylenhanced.misc.VoxylMisc;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
 import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import com.quasar.voxylenhanced.statsviewer.VoxylStatsViewer;
 import com.quasar.voxylenhanced.sumo.VoxylBlockSumo;
-import gg.essential.vigilance.gui.VigilancePalette;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
@@ -27,7 +29,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.5.3";
+    public static final String VERSION = "0.5.4";
 
     public static boolean willOpenSettings = false;
 
@@ -39,7 +41,8 @@ public class VoxylEnhanced
             new VoxylStatsViewer(),
             new VoxylHideMessages(),
             new VoxylMisc(),
-            new VoxylBlockSumo()
+            new VoxylBlockSumo(),
+            new VoxylDiscordRichPresence()
     );
     
     @EventHandler
@@ -55,6 +58,12 @@ public class VoxylEnhanced
 
         MinecraftForge.EVENT_BUS.register(new VoxylEnhancedMainListener());
         ClientCommandHandler.instance.registerCommand(new VoxylEnhancedCommand());
+
+        try {
+            VoxylDiscordRichPresence.initialize();
+        } catch (NoDiscordClientException ignored) {
+            System.out.println("something went wrong with rich presence for voxyl enhanced");
+        }
     }
 
     @Mod.EventHandler
@@ -68,6 +77,20 @@ public class VoxylEnhanced
         public void worldLoad(WorldEvent.Load event) {
             for (VoxylFeature listener : listeners) {
                 listener.reset();
+            }
+            if (VoxylUtils.isInVoxylNetwork()) {
+                VoxylUtils.getLatestVersion(new VoxylUtils.CallBack<Boolean, String>() {
+                    @Override
+                    public void call(Boolean outdated, String latestVersionText) {
+                        if (outdated) {
+                            settings.latestVersionNumber = VoxylUtils.getVersionNumberFromString(latestVersionText);
+                            VoxylUtils.informPlayer(EnumChatFormatting.GREEN,
+                                    "Voxyl Enhanced has a new version: " + latestVersionText);
+                            VoxylUtils.informPlayer(EnumChatFormatting.GRAY,
+                                    "This message will not appear again for some time");
+                        }
+                    }
+                });
             }
         }
 

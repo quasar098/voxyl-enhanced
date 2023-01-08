@@ -177,8 +177,10 @@ public class VoxylStatsViewer extends VoxylFeature {
                     public void onFailure(int i, Map<String, List<String>> map, String s) {
                         System.out.println("ERR: " + i);
                         if (i == 521) {
-                            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("The API is down! Tell Tom to fix it"));
-                            apiIsDown = true;
+                            if (!apiIsDown) {
+                                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("The API is down! Tell Tom to fix it"));
+                                apiIsDown = true;
+                            }
                         }
                     }
                     @Override

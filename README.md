@@ -14,6 +14,8 @@
 - hide annoying and repetitive messages from the server
 - automatically run /lactate every X seconds
 - levelhead for the players in your game
+- block sumo timer for when next item is
+- discord rich presence
 
 ### other things:
 

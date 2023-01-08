@@ -27,25 +27,6 @@ public class VoxylSettingsPage extends Vigilant {
     }
 
     @Property(
-            type = PropertyType.BUTTON,
-            name = "Obstacles Read Segments",
-            description = "Used for development purposes",
-            category = "General"
-    )
-    void obstaclesCollectData() {
-        VoxylMisc.obstaclesReadSegment(0);
-        VoxylMisc.obstaclesReadSegment(-15);
-        VoxylMisc.obstaclesReadSegment(-30);
-        VoxylMisc.obstaclesReadSegment(-45);
-        VoxylMisc.obstaclesReadSegment(-60);
-        VoxylMisc.obstaclesReadSegment(-75);
-        VoxylMisc.obstaclesReadSegment(-90);
-        VoxylMisc.obstaclesReadSegment(-105);
-        VoxylMisc.obstaclesReadSegment(-120);
-        VoxylMisc.obstaclesReadSegment(-135);
-    }
-
-    @Property(
             type = PropertyType.TEXT,
             name = "API Key",
             description = "Run /api new, then /api get, copy it, and put it here for the mod to work. Note that this is YOUR personal api key, no one else is supposed to see this",
@@ -63,6 +44,27 @@ public class VoxylSettingsPage extends Vigilant {
             max = 20
     )
     public int autoLactateInterval = 0;
+
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "Discord Rich Presence",
+            description = "Changes take effect when you leave and rejoin the server",
+            category = "General"
+    )
+    public boolean enableRichPresence = true;
+
+    // general (hidden)
+
+    @Property(
+            type = PropertyType.NUMBER,
+            name = "Latest Version Number",
+            description = "For internal usage in the mod",
+            category = "General",
+            hidden = true,
+            min = -1,
+            max = 1234567890
+    )
+    public int latestVersionNumber = VoxylUtils.getVersionNumberFromString(VoxylEnhanced.VERSION);
 
     // obstacles
 
@@ -452,7 +454,7 @@ public class VoxylSettingsPage extends Vigilant {
             description = "Self explanatory",
             category = "Block Sumo"
     )
-    public boolean blockSumoEnabled = false;
+    public boolean blockSumoEnabled = true;
 
     public VoxylSettingsPage(@NotNull File file) {
         super(file, "Voxyl Enhanced", new JVMAnnotationPropertyCollector(), new VoxylSortingBehavior());

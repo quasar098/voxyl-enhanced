@@ -26,7 +26,7 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "0.5.3"
+version = "0.5.4"
 group= "com.quasar.voxylenhanced" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "voxylenhanced"
 
@@ -52,10 +52,15 @@ repositories {
     maven {
         url = "https://repo.sk1er.club/repository/maven-public"
     }
+    mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile "gg.essential:vigilance-1.8.9-forge:223"
+    compile 'org.json:json:20220924'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+    compile group: 'com.kohlschutter.junixsocket', name: 'junixsocket-common', version: '2.6.1'
 
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -78,6 +83,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+    compile files('libs/async-http-client.jar')
     compile files('libs/async-http-client.jar')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
