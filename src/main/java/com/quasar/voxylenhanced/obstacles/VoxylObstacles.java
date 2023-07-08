@@ -6,7 +6,6 @@ import com.mb3364.http.AsyncHttpClient;
 import com.mb3364.http.StringHttpResponseHandler;
 import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
-import com.quasar.voxylenhanced.VoxylSettingsPage;
 import com.quasar.voxylenhanced.VoxylUtils;
 import com.quasar.voxylenhanced.misc.VoxylMisc;
 import net.minecraft.client.Minecraft;
@@ -32,9 +31,11 @@ public class VoxylObstacles extends VoxylFeature {
     public static String opponentWins = "???";
 
     // time related
-    public static Long time = null;
-    public static Long newTime = null;
+    public static Long gameStartTime = null;
+    public static Long currentTime = null;
     public static boolean stopGrowingTime = false;
+    public static String lastEstimatedArrivalString = null;
+    public static String previousPaceString = null;
 
     // quick reset
     public static boolean qrOpeningFirst = false;
@@ -104,7 +105,7 @@ public class VoxylObstacles extends VoxylFeature {
 
         // start the timer
         if (event.message.getUnformattedText().contains("Game starting in 5 seconds!")) {
-            time = System.currentTimeMillis()+5000L;
+            gameStartTime = System.currentTimeMillis()+5000L;
         }
 
         // get superscore
@@ -118,11 +119,11 @@ public class VoxylObstacles extends VoxylFeature {
         if (stopGrowPattern.matcher(event.message.getUnformattedText()).find()) {
             stopGrowingTime = true;
 
-            long calcNewTime = time;
+            long calcNewTime = gameStartTime;
             calcNewTime += (long) VoxylUtils.getIntBetween(event.message.getUnformattedText(), "was ", ":")*60000;
             calcNewTime += (long) VoxylUtils.getIntBetween(event.message.getUnformattedText(), ":", ".")*1000;
             calcNewTime += (long) VoxylUtils.getIntAfter(event.message.getUnformattedText(), ".");
-            newTime = calcNewTime;
+            currentTime = calcNewTime;
         }
     }
     public void attemptMakeApiRequest() {
@@ -171,6 +172,7 @@ public class VoxylObstacles extends VoxylFeature {
                             return;
                         }
                         try {
+                            //noinspection ConcatenationWithEmptyString
                             opponentWins = obstacles.get("wins").getAsInt() + "";
                             winsMap.put(opponentName, obstacles.get("wins").getAsInt());
                         } catch (NullPointerException e) {
@@ -289,7 +291,7 @@ public class VoxylObstacles extends VoxylFeature {
     @SubscribeEvent
     public void render(RenderGameOverlayEvent.Text event) {
         if (!stopGrowingTime) {
-            newTime = System.currentTimeMillis();
+            currentTime = System.currentTimeMillis();
         }
         if (isInObstacles && VoxylEnhanced.settings.obstaclesToggled) {
             boolean leftAligned = VoxylEnhanced.settings.obstaclesLeftAligned;
@@ -301,10 +303,10 @@ public class VoxylObstacles extends VoxylFeature {
             // opponent wins
             VoxylUtils.drawText("Opponent win stats: " + opponentWins, leftAligned, 5+(10 + spac));
 
-            if (time != null && newTime != null) {
+            if (gameStartTime != null && currentTime != null) {
 
                 // time elapsed
-                double timeElapsed = (newTime - time) / 1000.0;
+                double timeElapsed = (currentTime - gameStartTime) / 1000.0;
                 VoxylUtils.drawText("Time elapsed: " + df.format(timeElapsed), leftAligned, 5+((10+spac)*2));
 
                 if (startingX != null) {
@@ -316,8 +318,15 @@ public class VoxylObstacles extends VoxylFeature {
 
                     // estimated arrival
                     double estimatedArrival = timeElapsed/(Math.abs(startingX - Minecraft.getMinecraft().thePlayer.posX)/175);
-                    if (!(0 >= estimatedArrival || Double.isInfinite(estimatedArrival)) && (!stopGrowingTime)) {
-                        VoxylUtils.drawText("Estimated arrival: " + df.format(estimatedArrival), leftAligned, 5+((10+spac)*4));
+                    if (!(Double.isInfinite(estimatedArrival)) && (!stopGrowingTime)) {
+                        if (0 < estimatedArrival) {
+                            lastEstimatedArrivalString = df.format(estimatedArrival);
+                            VoxylUtils.drawText("Estimated arrival: " + lastEstimatedArrivalString, leftAligned, 5 + ((10 + spac) * 4));
+                        } else {
+                            if (previousPaceString != null) {
+                                VoxylUtils.drawText("Previous pace: " + previousPaceString, leftAligned, 5 + ((10 + spac) * 4));
+                            }
+                        }
                     }
                 }
             }
@@ -328,11 +337,17 @@ public class VoxylObstacles extends VoxylFeature {
     }
 
     public void reset() {
+        if (lastEstimatedArrivalString != null) {
+            if (VoxylEnhanced.settings.obstaclesShowPreviousPace) {
+                previousPaceString = lastEstimatedArrivalString;
+            }
+            lastEstimatedArrivalString = null;
+        }
         deathCount = 0;
         opponentName = null;
         opponentWins = "???";
-        time = null;
-        newTime = null;
+        gameStartTime = null;
+        currentTime = null;
         isInObstacles = false;
         stopGrowingTime = false;
         opponentWinsHasLoaded = false;

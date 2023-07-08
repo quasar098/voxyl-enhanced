@@ -110,6 +110,14 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean obstaclesDoSpeedScore = false;
 
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Show previous pace",
+            description = "Show previous pace on world leave",
+            category = "Obstacles"
+    )
+    public boolean obstaclesShowPreviousPace = true;
+
     // autogg
 
     @Property(
