@@ -7,17 +7,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.apache.commons.codec.digest.DigestUtils;
-
-import java.util.HashMap;
-import java.util.StringJoiner;
-
-import static com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments.getSegmentFromHash;
-import static com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments.speedScores;
 
 public class VoxylMisc extends VoxylFeature {
     public static void goToHub() {
@@ -52,92 +46,81 @@ public class VoxylMisc extends VoxylFeature {
         }
     }
 
-    public static float getSpeedScore() {
-        float total = 0f;
-        for (int i = 0; i > -105; i-=15) {
-            Float add = obstaclesReadSegment(i);
-            if (add != null) {
-                total += add;
-            }
-        }
-        return total;
-    }
-
-    public static Float obstaclesReadSegment(int offsetX) {
-        if (!VoxylEnhanced.settings.obstaclesDoSpeedScore) {
-            return null;
-        }
+    public static void obstaclesReadSegments() {
         if (Minecraft.getMinecraft() == null) {
-            return null;
+            return;
         }
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.thePlayer == null) {
-            return null;
+            return;
         }
         if (mc.theWorld == null) {
-            return null;
+            return;
         }
-        BlockPos pStart = mc.thePlayer.getPosition();
-        BlockPos checkStart = new BlockPos(
-                VoxylUtils.round(pStart.getX()+30, 100),
-                VoxylUtils.round(pStart.getY()+30, 100),
-                VoxylUtils.round(pStart.getZ(), 100)
+        EntityPlayerSP player = mc.thePlayer;
+
+        BlockPos playerPos = player.getPosition();
+        BlockPos startPosition = new BlockPos(
+                (Math.round((float) playerPos.getX() / 10000) * 10000) - 8,
+                100,
+                1983
         );
-        checkStart = checkStart.add(new BlockPos(-94, -98, -11));
+        if (startPosition.getX() > 0) {
+            startPosition = startPosition.add(new BlockPos(-1, 0, 0));
+        }
+        BlockPos endPosition = new BlockPos(
+                (Math.round((float) playerPos.getX() / 10000) * 10000) - 18,
+                110,
+                1993
+        );
+        if (endPosition.getX() > 0) {
+            endPosition = endPosition.add(new BlockPos(-1, 0, 0));
+        }
 
-        System.out.println(mc.thePlayer.getPosition());
-        System.out.println(checkStart);
-
-        BlockPos startPos = checkStart.add(-25+offsetX, -2, -6);
-        BlockPos endPos = startPos.add(10, 10, 10);
-        Iterable<BlockPos> positions = BlockPos.getAllInBox(startPos, endPos);
-
-        HashMap<BlockPos, Integer> blockTypes = new HashMap<>();
-        // 0=air, 1=andesite, 2=stone, 3=cobblestone, 4=clay, 99=unknown
-
-        System.out.println(startPos.toString());
-        System.out.println(endPos.toString());
-
-        for (BlockPos position : positions) {
-            IBlockState state = mc.theWorld.getBlockState(position);
-            if (state == null) {
-                continue;
+        for (int iteration = 0; iteration < 6; iteration++) {
+            if (iteration != 0) {
+                endPosition = endPosition.add(new BlockPos(-15, 0, 0));
+                startPosition = startPosition.add(new BlockPos(-15, 0, 0));
             }
-            Block block = state.getBlock();
-            BlockPos offset = position.subtract(startPos);
-            if (block == Blocks.air) {
-                blockTypes.put(offset, 0);
-            }
-            else if (block == Blocks.stone) {
-                if (Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.ANDESITE).getBlock() == block) {
-                    blockTypes.put(offset, 1);
-                } else {
-                    blockTypes.put(offset, 2);
+
+            VoxylUtils.informPlayer(Integer.toString(iteration));
+            VoxylUtils.informPlayer(startPosition.toString());
+            VoxylUtils.informPlayer(endPosition.toString());
+
+            StringBuilder builder = new StringBuilder();
+
+            // x+, y+, z+
+            for (int x = endPosition.getX(); x<=startPosition.getX(); x++) {
+                for (int y = startPosition.getY(); y<=endPosition.getY(); y++) {
+                    for (int z = startPosition.getZ(); z<=endPosition.getZ(); z++) {
+                        IBlockState state = mc.theWorld.getBlockState(new BlockPos(x, y, z));
+                        if (state == null) {
+                            continue;
+                        }
+                        Block block = state.getBlock();
+                        if (block == Blocks.air) {
+                            builder.append("a");  // air
+                        } else if (block == Blocks.stone) {
+                            if (Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.ANDESITE).getBlock() == block) {
+                                builder.append("b");  // andesite
+                            } else {
+                                builder.append("c");  // stone
+                            }
+                        } else if (block == Blocks.cobblestone) {
+                            builder.append("d");  // cobblestone
+                        } else if (block == Blocks.stained_hardened_clay) {
+                            builder.append("e");  // green hardened clay
+                        } else {
+                            builder.append("u");  // unknown
+                        }
+                    }
                 }
-            } else if (block == Blocks.cobblestone) {
-                blockTypes.put(offset, 3);
-            } else if (block == Blocks.stained_hardened_clay) {
-                blockTypes.put(offset, 4);
-            } else {
-                blockTypes.put(offset, 99);
             }
+            System.out.println(builder);
         }
-
-        StringJoiner joiner = new StringJoiner(",");
-        for (BlockPos pos : blockTypes.keySet()) {
-            String thing = convInteger(pos.getX());
-            thing += (convInteger(pos.getY()));
-            thing += (convInteger(pos.getZ()));
-            thing += (convInteger(blockTypes.getOrDefault(pos, 99)));
-            joiner.add(thing);
-        }
-
-        String hashed = DigestUtils.md5Hex(joiner.toString());
-
-        return speedScores.get(getSegmentFromHash(hashed));
     }
 
-    public Long lastLactateTime = 0L;
+    public Long lastLactateTime = 0L;  // this is cursed
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {

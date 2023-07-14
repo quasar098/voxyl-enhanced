@@ -7,7 +7,6 @@ import com.quasar.voxylenhanced.hidemessages.VoxylHideMessages;
 import com.quasar.voxylenhanced.misc.VoxylDiscordRichPresence;
 import com.quasar.voxylenhanced.misc.VoxylMisc;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
-import com.quasar.voxylenhanced.obstacles.VoxylObstaclesSegments;
 import com.quasar.voxylenhanced.statsviewer.VoxylStatsViewer;
 import com.quasar.voxylenhanced.sumo.VoxylBlockSumo;
 import net.minecraft.client.Minecraft;
@@ -29,7 +28,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.5.5";
+    public static final String VERSION = "0.5.6";
 
     public static boolean willOpenSettings = false;
 
@@ -49,7 +48,6 @@ public class VoxylEnhanced
     public void init(FMLInitializationEvent event)
     {
         VoxylInputHandler.register();
-        VoxylObstaclesSegments.init();
         MinecraftForge.EVENT_BUS.register(new VoxylInputHandler());
 
         for (VoxylFeature listener : listeners) {

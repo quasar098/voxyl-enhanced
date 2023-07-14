@@ -108,12 +108,6 @@ public class VoxylObstacles extends VoxylFeature {
             gameStartTime = System.currentTimeMillis()+5000L;
         }
 
-        // get superscore
-        Pattern gameNamesMessage = Pattern.compile("^Game starting in 1 second.?!");
-        if (gameNamesMessage.matcher(event.message.getUnformattedText()).find()) {
-            speedScore = VoxylMisc.getSpeedScore();
-        }
-
         // stop the timer
         Pattern stopGrowPattern = Pattern.compile("^Total time was.*:.*$");
         if (stopGrowPattern.matcher(event.message.getUnformattedText()).find()) {
@@ -329,9 +323,6 @@ public class VoxylObstacles extends VoxylFeature {
                         }
                     }
                 }
-            }
-            if (VoxylEnhanced.settings.obstaclesDoSpeedScore) {
-                VoxylUtils.drawText("Speed Score: " + df.format(speedScore), leftAligned, 5 + ((10 + spac) * 5));
             }
         }
     }

@@ -180,24 +180,6 @@ public class VoxylUtils {
         return scores.size() == 10;  // bad way but whatever
     }
 
-    public static int round(int number,int multiple) {
-
-        int result = multiple;
-
-        //If not already multiple of given number
-
-        if (number % multiple != 0){
-
-            int division = (number / multiple)+1;
-
-            result = division * multiple;
-
-        }
-
-        return result;
-
-    }
-
     public static UUID getUUIDfromStringWithoutDashes(String withoutDashes) {
         return java.util.UUID.fromString(
             withoutDashes.replaceFirst(

@@ -103,12 +103,14 @@ public class VoxylSettingsPage extends Vigilant {
     public int obstaclesSpacing = 3;
 
     @Property(
-            type = PropertyType.CHECKBOX,
-            name = "Speed score stuff",
-            description = "Enable speed score stuff. Currently WIP",
+            type = PropertyType.BUTTON,
+            name = "Collect segments",
+            description = "For debugging purposes only",
             category = "Obstacles"
     )
-    public boolean obstaclesDoSpeedScore = false;
+    void collectSegments() {
+        VoxylMisc.obstaclesReadSegments();
+    }
 
     @Property(
             type = PropertyType.CHECKBOX,
