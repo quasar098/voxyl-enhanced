@@ -28,7 +28,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.5.6";
+    public static final String VERSION = "0.5.7";
 
     public static boolean willOpenSettings = false;
 

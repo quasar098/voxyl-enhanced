@@ -101,7 +101,7 @@ public class VoxylMisc extends VoxylFeature {
                         if (block == Blocks.air) {
                             builder.append("a");  // air
                         } else if (block == Blocks.stone) {
-                            if (Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.ANDESITE).getBlock() == block) {
+                            if (state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.ANDESITE) {
                                 builder.append("b");  // andesite
                             } else {
                                 builder.append("c");  // stone
