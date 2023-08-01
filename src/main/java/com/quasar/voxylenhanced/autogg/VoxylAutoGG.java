@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VoxylAutoGG extends VoxylFeature {
@@ -47,9 +48,15 @@ public class VoxylAutoGG extends VoxylFeature {
         }
 
         if (VoxylEnhanced.settings.autoggToggled) {
-            Pattern pattern2 = Pattern.compile("^\\+.* kills");
-            if (pattern2.matcher(event.message.getUnformattedText()).find()) {
-                lastNumberOfKills = VoxylUtils.getIntBetween(event.message.getUnformattedText(), "+", " k");
+            Pattern pattern2 = Pattern.compile("^\\+(\\d+) kills.?.?.?$");
+            Matcher matcher = pattern2.matcher(event.message.getUnformattedText());
+            if (matcher.find()) {
+                lastNumberOfKills = Integer.parseInt(matcher.group(1));
+            }
+            Pattern pattern3 = Pattern.compile("^\\+\\d+ beds \\+(\\d+) kills.?.?.?$");
+            Matcher matcher2 = pattern3.matcher(event.message.getUnformattedText());
+            if (matcher2.find()) {
+                lastNumberOfKills = Integer.parseInt(matcher2.group(1));
             }
             Pattern pattern = Pattern.compile("^You have gained .*XP from this game!$");
             if (pattern.matcher(event.message.getUnformattedText()).find()) {

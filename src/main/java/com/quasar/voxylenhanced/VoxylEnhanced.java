@@ -29,7 +29,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.6.0";
+    public static final String VERSION = "0.6.1";
 
     public static boolean willOpenSettings = false;
 
@@ -82,7 +82,7 @@ public class VoxylEnhanced
                 VoxylUtils.getLatestVersion(new VoxylUtils.CallBack<Boolean, String>() {
                     @Override
                     public void call(Boolean outdated, String latestVersionText) {
-                        if (outdated) {
+                        if (outdated && !VERSION.equals(latestVersionText)) {
                             settings.latestVersionNumber = VoxylUtils.getVersionNumberFromString(latestVersionText);
                             VoxylUtils.informPlayer(EnumChatFormatting.GREEN,
                                     "Voxyl Enhanced has a new version: " + latestVersionText);

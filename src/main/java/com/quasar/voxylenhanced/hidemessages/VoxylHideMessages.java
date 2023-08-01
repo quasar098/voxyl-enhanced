@@ -3,12 +3,10 @@ package com.quasar.voxylenhanced.hidemessages;
 import com.quasar.voxylenhanced.VoxylEnhanced;
 import com.quasar.voxylenhanced.VoxylFeature;
 import com.quasar.voxylenhanced.VoxylUtils;
-import com.quasar.voxylenhanced.statsviewer.VoxylLevelhead;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -21,6 +19,8 @@ public class VoxylHideMessages extends VoxylFeature {
     static Pattern pObstaclesMomentum = Pattern.compile("^\\(!\\) When placing blocks on the side of an obstacle, consider jumping before placing a block - continuing the momentum\\.$");
     static Pattern pNoPlayers = Pattern.compile("^There appears to be no players in your game\\. Please report this in the discord!$");
     static Pattern pMessageInvites = Pattern.compile("^> \\[.*] .* has invited all lobby players to join .*!$");
+    static Pattern pClickHereJoinQueue = Pattern.compile("^(?:§e)?(?:§l)?Click here to join the queue!(?:§7)?$");
+    static Pattern pGameStarting = Pattern.compile("^A [A-Za-z ]+ game is starting in \\d+ seconds!$");
     static Pattern pTools = Pattern.compile("^\\(!\\) You can change your tool positions with /tools for better practice!$");
     static Pattern pRank = Pattern.compile("^\\(!\\) If you enjoy the server consider buying a rank! store\\.bedwarspractice\\.club$");
     static Pattern pCompass = Pattern.compile("^\\(!\\) Join a game from listed from the compass!$");
@@ -36,6 +36,11 @@ public class VoxylHideMessages extends VoxylFeature {
     static Pattern pAutomaticRearrange = Pattern.compile("^\\(!\\) Re-arrange your hotbar and it will automatically save\\.$");
     static Pattern pAvoidSame = Pattern.compile("^\\(!\\) Can avoid same players in a requeued game with 'avoid same players' option in /chatpref\\.$");
     static Pattern pDisconnected = Pattern.compile("^\\(!\\) If you are disconnected from your game, use /rejoin to reconnect\\.$");
+    static Pattern pSyncItems = Pattern.compile("^\\(!\\) Sync your items with hypixel but clicking the glowstone in the menu\\.$");
+    static Pattern pClutchSide = Pattern.compile("^\\(!\\) Clutch on the side of players to catch them unaware\\.$");
+    static Pattern pEnemySphere = Pattern.compile("^\\(!\\) If two enemy players are on the same item powerup sphere, the sphere will wait until one leaves\\.$");
+
+    static boolean hideNextJoinQueueMessage = false;
 
     // the settings for these are in VoxylSettingsPage
 
@@ -83,10 +88,15 @@ public class VoxylHideMessages extends VoxylFeature {
             if (pMessageInvites.matcher(m).find()) {
                 event.setCanceled(true);
             }
+            if (pClickHereJoinQueue.matcher(m).find() && hideNextJoinQueueMessage) {
+                hideNextJoinQueueMessage = false;
+                event.setCanceled(true);
+            }
         }
         if (VoxylEnhanced.settings.hideMessageTools) {
             if (pTools.matcher(m).find()) {
                 event.setCanceled(true);
+                hideNextJoinQueueMessage = true;
             }
         }
         if (VoxylEnhanced.settings.hideMessageRank) {  // i feel guilty
@@ -156,6 +166,27 @@ public class VoxylHideMessages extends VoxylFeature {
         }
         if (VoxylEnhanced.settings.hideMessageDisconnect) {
             if (pDisconnected.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageSyncItems) {
+            if (pSyncItems.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageGameStarting) {
+            if (pGameStarting.matcher(m).find()) {
+                hideNextJoinQueueMessage = true;
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageClutchSide) {
+            if (pClutchSide.matcher(m).find()) {
+                event.setCanceled(true);
+            }
+        }
+        if (VoxylEnhanced.settings.hideMessageEnemySphere) {
+            if (pEnemySphere.matcher(m).find()) {
                 event.setCanceled(true);
             }
         }

@@ -457,6 +457,38 @@ public class VoxylSettingsPage extends Vigilant {
     public boolean hideMessageDisconnect = true;
 
     @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Sync Items with Hypixel",
+            description = "(!) Sync your items with hypixel but clicking the glowstone in the menu.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageSyncItems = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Groping Message",
+            description = "(!) Clutch on the side of players to catch them unaware.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageClutchSide = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Enemy Sphere",
+            description = "(!) If two enemy players are on the same item powerup sphere, the sphere will wait until one leaves.",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageEnemySphere = true;
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Game Starting",
+            description = "A Beta Block Sumo game is starting in 40 seconds!",
+            category = "Hide Messages"
+    )
+    public boolean hideMessageGameStarting = true;
+
+    @Property(
             type = PropertyType.TEXT,
             name = "Custom regex",
             description = "Only put stuff here if you know what you're doing",

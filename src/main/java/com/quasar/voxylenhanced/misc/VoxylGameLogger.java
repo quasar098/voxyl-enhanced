@@ -25,6 +25,7 @@ public class VoxylGameLogger extends VoxylFeature {
     static Integer delayTicks = 0;
     static Integer actionNumber = 0;
     static Integer xpEarned = -1;
+    static boolean gameWon = false;
 
     boolean isToggled() {
         return VoxylEnhanced.settings.logFinishedGamesWebhookURL.startsWith("http");
@@ -90,6 +91,11 @@ public class VoxylGameLogger extends VoxylFeature {
                     delayTicks = 1;
                 }
             }
+            // no solid way to do this sadly
+            Pattern pattern3 = Pattern.compile("Game Won!");
+            if (pattern3.matcher(event.message.getUnformattedText()).find()) {
+                gameWon = true;
+            }
         }
     }
 
@@ -102,53 +108,63 @@ public class VoxylGameLogger extends VoxylFeature {
         if (Minecraft.getMinecraft() == null || Minecraft.getMinecraft().thePlayer == null) {
             return;
         }
+        if (!VoxylUtils.isInVoxylNetwork()) {
+            return;
+        }
         if (delayTicks > 0) {
-            if (actionNumber == 3) {
-                actionNumber = 0;
-                EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-                if (player.openContainer == null) {
-                    VoxylUtils.informPlayer("Failed to log game: container is null");
-                    System.out.println("container null");
+            attemptScrapeGUI: {
+                if (actionNumber == 3) {
+                    EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+                    if (player.openContainer == null) {
+                        VoxylUtils.informPlayer("Failed to log game: container is null");
+                        System.out.println("container null");
+                        break attemptScrapeGUI;
+                    }
+                    if (player.openContainer.getSlot(20) == null) {
+                        VoxylUtils.informPlayer("Failed to log game: slot is null");
+                        System.out.println("slot null");
+                        break attemptScrapeGUI;
+                    }
+                    if (player.openContainer.getSlot(20).getStack() == null) {
+                        System.out.println("stack null");
+                        break attemptScrapeGUI;
+                    }
+                    System.out.println("printing tooltips");
+                    StringBuilder builder = new StringBuilder();
+                    List<String> tooltips = player.openContainer.getSlot(20).getStack().getTooltip(player, false);
+                    for (String tooltip : tooltips) {
+                        builder.append(removeColorCodes(tooltip));
+                        builder.append("\n");
+                    }
+                    List<String> tooltips2 = player.openContainer.getSlot(22).getStack().getTooltip(player, false);
+                    for (String tooltip : tooltips2) {
+                        builder.append(removeColorCodes(tooltip));
+                        builder.append("\n");
+                    }
+                    List<String> tooltips3 = player.openContainer.getSlot(24).getStack().getTooltip(player, false);
+                    for (String tooltip : tooltips3) {
+                        builder.append(removeColorCodes(tooltip));
+                        builder.append("\n");
+                    }
+                    builder.append(gameWon ? "Game win state: WIN" : "Game win state: LOSE");
+                    builder.append("\n");
+                    String logThis = builder.toString().concat("XP gain: ").concat(Integer.toString(xpEarned));
+                    logEvent(logThis);
+                    VoxylUtils.informPlayer("Game successfully logged!");
+                    Minecraft.getMinecraft().thePlayer.closeScreen();
+                    actionNumber = 0;
+                    delayTicks = 0;
                     return;
                 }
-                if (player.openContainer.getSlot(20) == null) {
-                    VoxylUtils.informPlayer("Failed to log game: slot is null");
-                    System.out.println("slot null");
-                    return;
-                }
-                if (player.openContainer.getSlot(20).getStack() == null) {
-                    System.out.println("stack null");
-                    return;
-                }
-                System.out.println("printing tooltips");
-                StringBuilder builder = new StringBuilder();
-                List<String> tooltips = player.openContainer.getSlot(20).getStack().getTooltip(player, false);
-                for (String tooltip : tooltips) {
-                    builder.append(removeColorCodes(tooltip));
-                    builder.append("\n");
-                }
-                List<String> tooltips2 = player.openContainer.getSlot(22).getStack().getTooltip(player, false);
-                for (String tooltip : tooltips2) {
-                    builder.append(removeColorCodes(tooltip));
-                    builder.append("\n");
-                }
-                List<String> tooltips3 = player.openContainer.getSlot(24).getStack().getTooltip(player, false);
-                for (String tooltip : tooltips3) {
-                    builder.append(removeColorCodes(tooltip));
-                    builder.append("\n");
-                }
-                String logThis = builder.toString().concat("XP gain: ").concat(Integer.toString(xpEarned));
-                logEvent(logThis);
-                System.out.println(logThis);
-                VoxylUtils.informPlayer("Game successfully logged!");
-                Minecraft.getMinecraft().thePlayer.closeScreen();
-                delayTicks = 0;
             }
             delayTicks -= 1;
             if (delayTicks == 0) {
                 if (actionNumber == 1) {
                     Minecraft.getMinecraft().thePlayer.sendChatMessage("/lastgame");
                     actionNumber = 2;  // wait for gui to open
+                } else if (actionNumber == 3) {
+                    Minecraft.getMinecraft().thePlayer.closeScreen();
+                    actionNumber = 0;
                 }
             }
         }
@@ -169,7 +185,7 @@ public class VoxylGameLogger extends VoxylFeature {
         }
         if (actionNumber == 2) {
             actionNumber = 3;
-            delayTicks = 48;
+            delayTicks = 20;
         }
     }
 
