@@ -53,6 +53,14 @@ public class VoxylSettingsPage extends Vigilant {
     )
     public boolean enableRichPresence = true;
 
+    @Property(
+            type = PropertyType.TEXT,
+            name = "Log finished games webhook URL",
+            description = "Log finished games to this webhook (leave blank = off)",
+            category = "General"
+    )
+    public String logFinishedGamesWebhookURL = "";
+
     // general (hidden)
 
     @Property(
@@ -459,7 +467,7 @@ public class VoxylSettingsPage extends Vigilant {
     // block sumo
 
     @Property(
-            type= PropertyType.SWITCH,
+            type = PropertyType.SWITCH,
             name = "Block Sumo features enabled",
             description = "Self explanatory",
             category = "Block Sumo"

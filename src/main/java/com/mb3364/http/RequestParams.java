@@ -1,5 +1,7 @@
 package com.mb3364.http;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -254,26 +256,18 @@ public class RequestParams {
     }
 
     /**
-     * Encodes parameters into a query string based on the charset.
+     * Encodes parameters into a JSON string
      *
      * @return the parameters as an encoded query string
      * @see #setCharset(Charset)
      * @see #getCharset()
      */
     public String toEncodedString() {
-        try {
-            StringBuilder encoded = new StringBuilder();
-            for (ConcurrentHashMap.Entry<String, String> param : stringParams.entrySet()) {
-                if (encoded.length() > 0) encoded.append("&");
-                encoded.append(URLEncoder.encode(param.getKey(), charset.name()));
-                encoded.append("=");
-                encoded.append(URLEncoder.encode(param.getValue(), charset.name()));
-            }
-
-            return encoded.toString();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
+        JSONObject obj = new JSONObject();
+        for (String param : stringParams.keySet()) {
+            obj.put(param, stringParams.get(param));
         }
+
+        return obj.toString();
     }
 }

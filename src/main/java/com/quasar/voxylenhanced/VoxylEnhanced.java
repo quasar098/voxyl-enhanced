@@ -5,6 +5,7 @@ import com.jagrosh.discordipc.exceptions.NoDiscordClientException;
 import com.quasar.voxylenhanced.autogg.VoxylAutoGG;
 import com.quasar.voxylenhanced.hidemessages.VoxylHideMessages;
 import com.quasar.voxylenhanced.misc.VoxylDiscordRichPresence;
+import com.quasar.voxylenhanced.misc.VoxylGameLogger;
 import com.quasar.voxylenhanced.misc.VoxylMisc;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
 import com.quasar.voxylenhanced.statsviewer.VoxylStatsViewer;
@@ -28,7 +29,7 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.5.8";
+    public static final String VERSION = "0.6.0";
 
     public static boolean willOpenSettings = false;
 
@@ -41,7 +42,8 @@ public class VoxylEnhanced
             new VoxylHideMessages(),
             new VoxylMisc(),
             new VoxylBlockSumo(),
-            new VoxylDiscordRichPresence()
+            new VoxylDiscordRichPresence(),
+            new VoxylGameLogger()
     );
     
     @EventHandler

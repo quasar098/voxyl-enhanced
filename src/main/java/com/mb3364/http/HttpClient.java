@@ -80,9 +80,10 @@ public abstract class HttpClient {
                     urlConnection.setChunkedStreamingMode(32 * 1024); // 32kb at a time
                     MultipartWriter.write(urlConnection, params);
                 } else {
-                    // Send content as form-urlencoded
+                    // Send content as JSON
                     byte[] content = params.toEncodedString().getBytes();
-                    urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + params.getCharset().name());
+                    urlConnection.setRequestProperty("Accept", "application/json");
+                    urlConnection.setRequestProperty("Content-Type", "application/json");
                     urlConnection.setRequestProperty("Content-Length", Long.toString(content.length));
                     urlConnection.setFixedLengthStreamingMode(content.length); // Stream the data so we don't run out of memory
                     try (OutputStream os = urlConnection.getOutputStream()) {
