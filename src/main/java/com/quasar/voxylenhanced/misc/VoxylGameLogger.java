@@ -126,7 +126,15 @@ public class VoxylGameLogger extends VoxylFeature {
                         break attemptScrapeGUI;
                     }
                     if (player.openContainer.getSlot(20).getStack() == null) {
-                        System.out.println("stack null");
+                        System.out.println("stack 1 null");
+                        break attemptScrapeGUI;
+                    }
+                    if (player.openContainer.getSlot(22).getStack() == null) {
+                        System.out.println("stack 2 null");
+                        break attemptScrapeGUI;
+                    }
+                    if (player.openContainer.getSlot(24).getStack() == null) {
+                        System.out.println("stack 3 null");
                         break attemptScrapeGUI;
                     }
                     System.out.println("printing tooltips");
@@ -153,6 +161,7 @@ public class VoxylGameLogger extends VoxylFeature {
                     VoxylUtils.informPlayer("Game successfully logged!");
                     Minecraft.getMinecraft().thePlayer.closeScreen();
                     actionNumber = 0;
+                    gameWon = false;
                     delayTicks = 0;
                     return;
                 }
@@ -162,8 +171,9 @@ public class VoxylGameLogger extends VoxylFeature {
                 if (actionNumber == 1) {
                     Minecraft.getMinecraft().thePlayer.sendChatMessage("/lastgame");
                     actionNumber = 2;  // wait for gui to open
-                } else if (actionNumber == 3) {
+                } else if (actionNumber == 3) {  // gui timeout
                     Minecraft.getMinecraft().thePlayer.closeScreen();
+                    gameWon = false;
                     actionNumber = 0;
                 }
             }
@@ -185,7 +195,7 @@ public class VoxylGameLogger extends VoxylFeature {
         }
         if (actionNumber == 2) {
             actionNumber = 3;
-            delayTicks = 20;
+            delayTicks = 29;
         }
     }
 

@@ -5,6 +5,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.util.List;
 
@@ -39,6 +40,15 @@ public class VoxylEnhancedCommand extends CommandBase {
         if (args.length == 0) {
             VoxylEnhanced.willOpenSettings = true;
         } else if (args.length == 1) {
+            if (args[0].equals("inviteabunch") || args[0].equals("i") || args[0].equals("invite")) {
+                VoxylEnhanced.settings.inviteABunch = !VoxylEnhanced.settings.inviteABunch;
+                if (VoxylEnhanced.settings.inviteABunch) {
+                    VoxylUtils.informPlayer(EnumChatFormatting.GREEN, "Invite-a-bunch enabled!");
+                } else {
+                    VoxylUtils.informPlayer(EnumChatFormatting.RED, "Invite-a-bunch disabled!");
+                }
+                return;
+            }
             VoxylEnhanced.settings.apiKey = args[0];
             messageResponse(String.format("Set api key to %s", VoxylEnhanced.settings.apiKey));
         } else commandHelpMessage();

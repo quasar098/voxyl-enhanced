@@ -3,6 +3,7 @@ package com.quasar.voxylenhanced;
 import com.quasar.voxylenhanced.misc.VoxylMisc;
 import com.quasar.voxylenhanced.obstacles.VoxylObstacles;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -29,6 +30,12 @@ public class VoxylInputHandler {
                 "voxylenhanced.vekeybinds"
         ));  // 1, obstaclesautorequeue
 
+        keyBindings.add(new KeyBinding(
+                "voxylenhanced.inviteabunch",
+                Keyboard.KEY_NONE,
+                "voxylenhanced.vekeybinds"
+        ));  // 2, inviteabunch
+
         for (KeyBinding keyBinding : keyBindings) {
             ClientRegistry.registerKeyBinding(keyBinding);
         }
@@ -41,6 +48,14 @@ public class VoxylInputHandler {
         }
         if (keyBindings.get(1).isPressed()) {
             VoxylObstacles.restartPrivateGame();
+        }
+        if (keyBindings.get(2).isPressed()) {
+            VoxylEnhanced.settings.inviteABunch = !VoxylEnhanced.settings.inviteABunch;
+            if (VoxylEnhanced.settings.inviteABunch) {
+                VoxylUtils.informPlayer(EnumChatFormatting.GREEN, "Invite-a-bunch enabled!");
+            } else {
+                VoxylUtils.informPlayer(EnumChatFormatting.RED, "Invite-a-bunch disabled!");
+            }
         }
     }
 }

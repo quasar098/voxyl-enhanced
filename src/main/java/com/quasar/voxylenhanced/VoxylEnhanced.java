@@ -29,8 +29,9 @@ import java.util.List;
 public class VoxylEnhanced
 {
     public static final String MODID = "voxylenhanced";
-    public static final String VERSION = "0.6.1";
+    public static final String VERSION = "0.6.3";
 
+    static boolean hasCheckedUpdates = false;
     public static boolean willOpenSettings = false;
 
     public static VoxylSettingsPage settings;
@@ -78,7 +79,8 @@ public class VoxylEnhanced
             for (VoxylFeature listener : listeners) {
                 listener.reset();
             }
-            if (VoxylUtils.isInVoxylNetwork()) {
+            if (!hasCheckedUpdates && VoxylUtils.isInVoxylNetwork()) {
+                hasCheckedUpdates = true;
                 VoxylUtils.getLatestVersion(new VoxylUtils.CallBack<Boolean, String>() {
                     @Override
                     public void call(Boolean outdated, String latestVersionText) {

@@ -16,9 +16,11 @@ import java.util.regex.Pattern;
 public class VoxylBlockSumo extends VoxylFeature {
 
     static Pattern pOpItemSpawning = Pattern.compile("^An OP Item is spawning on the gold block in 5 seconds!.*$");
+    static Pattern pPowerupSpawning = Pattern.compile("^Powerup spawning in 10 seconds!.?.?.?$");
     static Pattern pAllPlayerItems = Pattern.compile("^All players have recieved.*$");
     static Long nextPowerItem = null;
     static Long nextRegularItem = null;
+    static boolean isBSD = false;
     static DecimalFormat df = new DecimalFormat("0.0");
 
     @SubscribeEvent
@@ -34,9 +36,15 @@ public class VoxylBlockSumo extends VoxylFeature {
         }
         if (pOpItemSpawning.matcher(event.message.getUnformattedText()).find()) {
             nextPowerItem = System.currentTimeMillis() + 5000L;
+            isBSD = false;
+        }
+        if (pPowerupSpawning.matcher(event.message.getUnformattedText()).find()) {
+            nextPowerItem = System.currentTimeMillis() + 10000L;
+            isBSD = true;
         }
         if (pAllPlayerItems.matcher(event.message.getUnformattedText()).find()) {
             nextRegularItem = System.currentTimeMillis() + 25000L;
+            isBSD = false;
         }
     }
 
@@ -52,7 +60,12 @@ public class VoxylBlockSumo extends VoxylFeature {
 
         if (nextPowerItem != null) {
             if (nextPowerItem < System.currentTimeMillis()) {
-                nextPowerItem = System.currentTimeMillis() + 30000L;
+                if (!isBSD) {
+                    nextPowerItem = System.currentTimeMillis() + 30000L;
+                } else {
+                    // may not be fully accurate
+                    nextPowerItem = System.currentTimeMillis() + 25000L;
+                }
             }
             VoxylUtils.drawText("OP Item: " + formatTime(nextPowerItem,  System.currentTimeMillis()), false, 5);
         }

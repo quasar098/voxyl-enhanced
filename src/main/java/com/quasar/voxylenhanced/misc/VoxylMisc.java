@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -22,28 +23,6 @@ public class VoxylMisc extends VoxylFeature {
             return;
         }
         Minecraft.getMinecraft().thePlayer.sendChatMessage("/hub");
-    }
-
-    public static String convInteger(Integer integer) {
-        switch (integer) {
-            case (0): return "A";
-            case (1): return "B";
-            case (2): return "C";
-            case (3): return "D";
-            case (4): return "E";
-            case (5): return "F";
-            case (6): return "G";
-            case (7): return "H";
-            case (8): return "I";
-            case (9): return "J";
-            case (10): return "K";
-            case (11): return "L";
-            case (12): return "M";
-            case (13): return "N";
-            case (14): return "O";
-            case (15): return "P";
-            default: return "X";
-        }
     }
 
     public static void obstaclesReadSegments() {
@@ -121,19 +100,34 @@ public class VoxylMisc extends VoxylFeature {
     }
 
     public Long lastLactateTime = 0L;  // this is cursed
+    public Long lastInviteTime = 0L;
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (!VoxylUtils.isInBWPLobby()) {
             return;
         }
-        if (VoxylEnhanced.settings.autoLactateInterval == 0) {
-            return;
+        if (VoxylEnhanced.settings.inviteABunch) {
+            if (lastInviteTime < System.currentTimeMillis()-31000L) {
+                lastInviteTime = System.currentTimeMillis();
+                Minecraft.getMinecraft().thePlayer.sendChatMessage("/invite");
+            }
         }
-        if (lastLactateTime == 0 || lastLactateTime < System.currentTimeMillis()-(VoxylEnhanced.settings.autoLactateInterval * 1000L)) {
-            lastLactateTime = System.currentTimeMillis();
-            Minecraft.getMinecraft().thePlayer.sendChatMessage("/lactate");
+        autoLactate: {
+            if (VoxylEnhanced.settings.autoLactateInterval == 0) {
+                break autoLactate;
+            }
+            if (lastLactateTime == 0 || lastLactateTime < System.currentTimeMillis()-(VoxylEnhanced.settings.autoLactateInterval * 1000L)) {
+                lastLactateTime = System.currentTimeMillis();
+                Minecraft.getMinecraft().thePlayer.sendChatMessage("/lactate");
+            }
         }
+    }
+
+    @SubscribeEvent
+    public void onWorldUnload(WorldEvent.Unload event) {
+        VoxylEnhanced.settings.inviteABunch = false;
+        lastInviteTime = 69420L;  // this is necessary... trust me...
     }
 
     public void reset() {

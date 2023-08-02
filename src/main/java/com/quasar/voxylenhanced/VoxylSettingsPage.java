@@ -47,6 +47,14 @@ public class VoxylSettingsPage extends Vigilant {
 
     @Property(
             type = PropertyType.SWITCH,
+            name = "Invite a bunch",
+            description = "Requires expert rank. Don't be a nuisance! Run /invite every 31 seconds. Automatically disables on world change.",
+            category = "General"
+    )
+    public boolean inviteABunch = false;
+
+    @Property(
+            type = PropertyType.SWITCH,
             name = "Discord Rich Presence",
             description = "Changes take effect when you leave and rejoin the server",
             category = "General"
